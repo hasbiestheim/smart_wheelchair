@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-import roslib; roslib.load_manifest('chad_sonar')
+import roslib; roslib.load_manifest('sonar_joy')
 import rospy
 import serial
-from chad_sonar.msg import Sonar
+from sonar_joy.msg import Sonar
 
 def sendMessage(sonarId, distance):
 	sonarDictionary = {'3':"frontLeftSonar", '2':"frontRightSonar"}
