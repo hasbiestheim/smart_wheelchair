@@ -1,0 +1,10 @@
+<stack>
+  <description brief="smart_wheelchair">smart_wheelchair</description>
+  <author>Maintained by Eric Perko</author>
+  <license>BSD</license>  
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/smart_wheelchair</url>
+  <depend stack="geometry" /> <!-- tf -->
+  <depend stack="ros" /> <!-- std_msgs, rospy, roscpp -->
+
+</stack>
