@@ -6,7 +6,7 @@ from joy.msg import Joy
 
 class JoyLimiter:
 	def __init__(self):
-		self.threshold = .5
+		self.threshold = .8
 		self.dangerL = False
 		self.dangerR = False
 		# Define listener
@@ -21,17 +21,19 @@ class JoyLimiter:
 		dist = data.range
 		if(data.range < self.threshold and data.header.frame_id == "frontLeftSonar"):
 			self.dangerL = True
-		else:
+		elif(data.header.frame_id == "frontLeftSonar"):
 			self.dangerL = False
 		if(data.range < self.threshold and data.header.frame_id == "frontRightSonar"):
 			self.dangerR = True
-		else:
+		elif(data.header.frame_id == "frontRightSonar"):
 			self.dangerR = False
 
 	def stopForward(self, vCmd):
+		#print "LEFT IS: " + str(self.dangerL)
+		#print "RIGHT IS: " + str(self.dangerR)
 		if(vCmd <= 0):
 			return vCmd
-		elif(dangerL or dangerR):
+		elif(self.dangerL or self.dangerR):
 			return 0
 		return vCmd
 
@@ -39,8 +41,8 @@ class JoyLimiter:
 	def processJoy(self,data):
 		cmdVx = data.axes[1]
 		cmdWz = data.axes[0]
-		outputVx = stopForward(cmdVx)
-		message = JoyLimiter.sendJoy(data,outputVx,outputWz)
+		outputVx = self.stopForward(cmdVx)
+		message = JoyLimiter.sendJoy(data,outputVx,cmdWz)
 		self.pub.publish(message)
 
 	@staticmethod

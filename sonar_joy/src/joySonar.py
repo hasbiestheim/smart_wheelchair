@@ -8,8 +8,8 @@ class JoyLimiter:
 	def __init__(self):
 
 		self.linear_Gain = .3
-		self.angular_Gain = .8
-		self.steering_Gain = .1
+		self.angular_Gain = 2
+		self.steering_Gain = 1
 
 		self.EFx = 0.0
 		self.ETx = 0.0
@@ -46,7 +46,7 @@ class JoyLimiter:
 		cmdVx = data.axes[1]
 		cmdWz = data.axes[0]
 		outputVx = self.linear_Gain*self.EFx*abs(cmdVx)+cmdVx
-		outputWz = self.angular_Gain*self.ETx*abs(cmdWz)+cmdWz + self.steering_Gain*self.ETx*abs(cmdVx)
+		outputWz = self.angular_Gain*self.ETx*abs(cmdWz)+cmdWz - self.steering_Gain*self.ETx*abs(cmdVx)
 		message = JoyLimiter.sendJoy(data,outputVx,outputWz)
 		self.pub.publish(message)
 
