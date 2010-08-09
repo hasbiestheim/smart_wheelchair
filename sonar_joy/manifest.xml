@@ -1,0 +1,20 @@
+<package>
+  <description brief="sonar_joy">
+
+     sonar_joy
+
+  </description>
+  <author>Chad Rockey</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/sonar_joy</url>
+  <depend package="std_msgs"/>
+  <depend package="rospy"/>
+  <depend package="roscpp"/>
+  <depend package="joy"/>
+
+  <rosdep name="python-serial" />
+
+</package>
+
+
