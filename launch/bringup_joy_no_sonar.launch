@@ -2,10 +2,7 @@
 
 	<node pkg="wheelchair_base_controller" type="joy2chair.py" name="joy2chair">
         	<param name="port_name" value="/dev/ttyUSB1" />
-		<remap from="joy" to="sonar_Joy" />
-	</node>
-
-	<node pkg="sonar_joy" type="joySonar.py" name="joypublish" output="screen">
+		<remap from="joy" to="joy" />
 	</node>
 
 	<node pkg="sonar_joy" type="arduinoReader.py" name="ardRead" output="screen">
