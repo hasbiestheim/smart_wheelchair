@@ -21,7 +21,7 @@ class Joy2Chair:
 		throttle = abs(data.axes[2]) #wheelchair doesn't go backwards, so don't send me negative throttles
 		# Send command down to arduino
 		# 254 is max, but need to limit between???  1V and 4V :-P (so like: 56 and 198)
-		command_string = "%d %d %d\r" % (127 + cmdVx*71.0,127 - cmdWz*71.0, throttle * 255)
+		command_string = "%d %d %d\r" % (137 + cmdVx*71.0,137 - cmdWz*71.0, throttle * 255)
 		self.port.write(command_string)
 
 if __name__ == '__main__':
