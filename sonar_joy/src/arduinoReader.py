@@ -5,7 +5,7 @@ import serial
 from sonar_joy.msg import Sonar
 
 def sendMessage(sonarId, distance):
-	sonarDictionary = {'3':"frontLeftSonar", '2':"frontRightSonar"}
+	sonarDictionary = {'2':"frontLeftSonar", '3':"frontRightSonar"}
 	sonarName = sonarDictionary[sonarId]
 	sonar = Sonar()
 	sonar.header.stamp = rospy.Time.now()

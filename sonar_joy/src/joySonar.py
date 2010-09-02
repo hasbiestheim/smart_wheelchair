@@ -8,8 +8,8 @@ class JoyLimiter:
 	def __init__(self):
 
 		self.linear_Gain = .3
-		self.angular_Gain = 2
-		self.steering_Gain = 1
+		self.angular_Gain = 1
+		self.steering_Gain = .8
 
 		self.EFx = 0.0
 		self.ETx = 0.0
