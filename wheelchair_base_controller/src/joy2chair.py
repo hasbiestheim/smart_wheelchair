@@ -18,7 +18,8 @@ class Joy2Chair:
 		cmdVx = data.axes[1]
 		#print cmdVx
 		cmdWz = data.axes[0]
-		throttle = abs(data.axes[2]) #wheelchair doesn't go backwards, so don't send me negative throttles
+        # -1 is fastest, +1 is slowest, pushing causes axis to become most negative
+		throttle = .5-.45*data.axes[2] #wheelchair throttle does not accept negative values
 		# Send command down to arduino
 		# 254 is max, but need to limit between???  1V and 4V :-P (so like: 56 and 198)
 		command_string = "%d %d %d\r" % (137 + cmdVx*71.0,137 - cmdWz*71.0, throttle * 255)
