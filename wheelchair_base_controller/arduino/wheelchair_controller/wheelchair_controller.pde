@@ -2,10 +2,10 @@
 
 Messenger receiver;
 
-const int throttle_pwm_pin = 11;
-const int steering_pwm_pin = 10;
-const int speed_control_pwm_pin = 9;
-const int enable_assistant_dio_pin = 8;
+const int throttle_pwm_pin = 8;
+const int steering_pwm_pin = 9;
+const int speed_control_pwm_pin = 10;
+const int enable_assistant_dio_pin = 52;
 
 const int neutral = 128;
 const int min_1v = 51;
@@ -50,7 +50,7 @@ int limitSpeed(int cmd){
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("      Wheelchair Control Program v0.3");
+  Serial.println("      Wheelchair Control Program v0.4");
   Serial.println("Args are [throttle steering speed] all ints, separated by spaces");
   
   receiver.attach(executeCommand);
