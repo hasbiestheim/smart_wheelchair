@@ -1,0 +1,21 @@
+<package>
+  <description brief="ottoSim">
+
+     ottoSim
+
+  </description>
+  <author>Chad Rockey</author>
+  <license>LGPL</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/cwru_sim_stage</url>
+  <depend package="stage"/>
+  <depend package="cwru_nav"/>
+  <depend package="map_server" />
+  <depend package="cwru_maps" />
+  <depend package="cwru_teleop" />
+  <depend package="nav_view" />
+  <depend package="amcl" />
+
+</package>
+
+

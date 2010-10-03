@@ -1,0 +1,18 @@
+include "map.inc"
+include "otto.inc"
+
+window
+(
+    size [1024.0 768.0]
+
+    scale 5.0
+)
+
+# set the resolution of the underlying raytracer in meters
+resolution 0.01
+
+threads 4
+
+ottoModel( pose [ 0.0 0.0 0.0 0.0 ] name "otto" color "black")
+
+#interval_sim 100

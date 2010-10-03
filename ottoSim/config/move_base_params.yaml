@@ -1,0 +1,7 @@
+recovery_behaviors:
+    - name: conservative_reset 
+      type: ClearCostmapRecovery
+    - name: rotate_recovery
+      type: RotateRecovery
+    - name: aggressive_reset
+      type: ClearCostmapRecovery
