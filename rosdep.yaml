@@ -2,3 +2,4 @@
 
 python-serial:
     ubuntu: python-serial
+    gentoo: pyserial
