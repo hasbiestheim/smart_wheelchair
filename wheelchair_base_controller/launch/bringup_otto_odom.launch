@@ -1,0 +1,27 @@
+<launch>
+
+    <node pkg="joy" type="joy_node" name="joy_node">
+	    <param name="autorepeat_rate" value="20.0" />
+	    <param name="dev" type="string" value="/dev/input/js0" />
+	    <param name="deadzone" value="0.2" /><!-- try to fix for wheelchair -->
+    </node>
+
+    <node pkg="wheelchair_base_controller" type="joy2twist.py" name="joytwisterizer">
+    </node>
+
+    <node pkg="wheelchair_base_controller" type="twist2joy.py" name="joyuntwister">
+    </node>
+
+    <node pkg="wheelchair_base_controller" type="imu_quatcaster.py" name="imu_broadcaster">
+    </node>
+
+    <node pkg="wheelchair_base_controller" type="otto_ekf.py" name="Otto_EKF">
+    </node>
+
+
+    <node pkg="wheelchair_base_controller" type="joy2chair.py" name="joy2chair">
+	    <param name="port_name" value="/dev/ttyUSB0" />
+	    <remap from="joy" to="cmd_joy" />
+    </node>
+
+</launch>
