@@ -3,5 +3,6 @@
         roslisp-msg-protocol)
   (:export
    "<SONAR>"
+   "<RANGER>"
   ))
 
