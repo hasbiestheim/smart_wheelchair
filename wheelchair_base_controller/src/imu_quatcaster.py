@@ -53,8 +53,8 @@ class SF9DOF_Broadcaster:
                 rospy.logerr("Did not get a valid IMU packet, got %s", line)
 
 if __name__ == "__main__":
-    rospy.init_node('sparkfun_9dof_razor')
-    port_name = rospy.get_param("~port_name", "/dev/ttyUSB1")
+    rospy.init_node('imu_quatcaster')
+    port_name = rospy.get_param("~port_name", "/dev/ttyUSB0")
     port = serial.Serial(port_name, 115200, timeout = 1)
     tf_br = tf.TransformBroadcaster()
     broadcaster = SF9DOF_Broadcaster(port)

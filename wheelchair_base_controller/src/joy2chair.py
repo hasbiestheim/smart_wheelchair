@@ -9,7 +9,6 @@ from joy.msg import Joy
 class Joy2Chair:
   def __init__(self):
     # Define listener
-    rospy.init_node('joy2chair')
     port_name = rospy.get_param("~port_name", "/dev/ttyUSB0")
     self.port = serial.Serial(port_name, 115200)
     rospy.Subscriber('joy', Joy, self.processJoy)
@@ -28,6 +27,7 @@ class Joy2Chair:
     self.port.write(struct.pack(">BBBB", cmdVx, cmdWz, throttle, 0))
 
 if __name__ == '__main__':
+  rospy.init_node('joy2chair')
   try:
     chairSender = Joy2Chair()
   except rospy.ROSInterruptException: pass
