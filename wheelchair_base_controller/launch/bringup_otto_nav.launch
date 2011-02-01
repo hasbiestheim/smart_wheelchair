@@ -1,0 +1,12 @@
+<launch>
+    <include file="$(find wheelchair_base_controller)/launch/bringup_otto_amcl.launch" />
+
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <rosparam file="$(find cwru_configs)/otto/nav/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find cwru_configs)/otto/nav/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find cwru_configs)/otto/nav/costmap_local_params.yaml" command="load" />
+    <rosparam file="$(find cwru_configs)/otto/nav/costmap_global_params.yaml" command="load" />
+    <rosparam file="$(find cwru_configs)/otto/nav/base_local_planner_params.yaml" command="load" />
+    <!--rosparam file="$(find cwru_configs)/otto/nav/move_base_params.yaml" command="load" /-->
+  </node>
+</launch>

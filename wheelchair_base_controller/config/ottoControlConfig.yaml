@@ -1,0 +1,10 @@
+cmdVMax: 1.2
+cmdWMax: 1.0
+cmdRevMax: 0.5
+smoothJoy: false
+
+invacareVMax: 1.3286
+invacareWMax: 1.09
+invacareAccel: 1.0
+invacareBrake: 2.1
+invacareJoyDeadband: 0.15
