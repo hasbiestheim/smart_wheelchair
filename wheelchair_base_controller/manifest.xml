@@ -16,7 +16,6 @@
   <depend package="joy"/>
   <depend package="geometry_msgs"/>
   <depend package="nav_msgs"/>
-  <depend package="cwru_teleop"/>
 
   <rosdep name="python-serial" />
 

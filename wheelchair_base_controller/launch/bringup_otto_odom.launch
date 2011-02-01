@@ -14,7 +14,7 @@
   </node>
 
   <node pkg="wheelchair_base_controller" type="imu_quatcaster.py" name="imu_broadcaster">
-    <param name="port_name" value="/dev/ttyUSB1" />
+    <param name="port_name" value="/dev/sensors/ftdi_A700eHSG" />
   </node>
 
   <node pkg="wheelchair_base_controller" type="otto_ekf.py" name="Otto_EKF">
@@ -24,7 +24,7 @@
 
 
   <node pkg="wheelchair_base_controller" type="joy2chair.py" name="joy2chair">
-    <param name="port_name" value="/dev/ttyUSB0" />
+    <param name="port_name" value="/dev/sensors/ftdi_A900ceGt" />
     <remap from="joy" to="cmd_joy" />
   </node>
 
