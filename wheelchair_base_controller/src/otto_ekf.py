@@ -31,22 +31,28 @@ from geometry_msgs.msg import Quaternion
 class EKF:    
   def __init__(self, gX):
     # Kalman process noise
-    q = array((1e-8, 1e-8, 1e-8, .10, .10, .10))
+    qxy = float(rospy.get_param('~Process_Noise/qXY', '1e-8'))
+    qth = float(rospy.get_param('~Process_Noise/qW', '1e-8'))
+    qv = float(rospy.get_param('~Process_Noise/qV', '0.001'))
+    qw = float(rospy.get_param('~Process_Noise/qWp', '0.10'))
+    qa = float(rospy.get_param('~Process_Noise/qA', '0.10'))
+    q = array((qxy, qxy, qth, qv, qw, qa))
     self.Q = diagflat(q)
     
     # Sensor variances
-    
+    self.qgyro = float(rospy.get_param('~Measurement_Noise/gZvar', '0.1'))
+    self.qaccel = float(rospy.get_param('~Measurement_Noise/aXVar', '0.1'))
     
     # Model constants
-    self.dt = 1.0/50.0
+    self.dt = float(rospy.get_param('~dt', '0.02'))
     
     # Linear acceleration and braking
-    self.ax = 1.0 # try [.9 1.0 1.1 1.2]
-    self.bx = 2.1 # try [2.0 2.1 2.2]
+    self.ax = float(rospy.get_param('~invacareAccel', '1.0'))
+    # try [.9 1.0 1.1 1.2]
+    self.bx = float(rospy.get_param('~invacareBrake', '2.0'))
+    # try [2.0 2.1 2.2]
     
-    # Angular acceleration and braking
-    self.aphz = 0.643
-    self.bphz = 7.5
+    self.gz = 0.12
 
     self.initCommon()
 
@@ -56,7 +62,6 @@ class EKF:
     self.P = eye(6) # Covariance matrix
     self.cmd = Twist()
     
-    rospy.init_node('otto_ekf')
     rospy.Subscriber('cmd_vel', Twist, self.record_command)
     rospy.Subscriber('imu', Imu, self.update_filter)
     self.odom_pub = rospy.Publisher('odom', Odometry)
@@ -87,7 +92,7 @@ class EKF:
     a = self.returnAccelFromV(self.cmd.linear.x, v, self.ax, self.bx, self.dt)
     #alpha = self.returnAccelFromV(self.cmd.angular.z, w, self.aphz, self.bphz, self.dt)
     
-    if(abs(self.cmd.linear.x) < 0.05 and abs(a < 0.05)):
+    if(abs(self.cmd.linear.x) < 0.01 and abs(v < 0.05)):
       v = 0.0
     
     # Actual state predictions
@@ -132,24 +137,28 @@ class EKF:
     
   def sensor_update(self, msg):
     self.sensorJacobian()
+    zp = self.sensor_prediction()
     
     # Assume that our angular velocity is the magnitude of the vector and in the direction of y
     wm = sign(msg.angular_velocity.y)*sqrt(pow(msg.angular_velocity.x,2)+pow(msg.angular_velocity.y,2)+pow(msg.angular_velocity.z,2))
     
     # Assume our acceleration is the magnitude of the vector (excluding x!!!) minus gravity
     
-    '''amag = pow(msg.linear_acceleration.y,2)+pow(msg.linear_acceleration.z,2)-pow(9.734,2)
-    if(amag < 0):
-      amag = 0.0 # Beware of imaginary numbers caused by accelerometer noise/poor scaling
-    am = -sign(msg.linear_acceleration.z)*sqrt(amag)
+    '''amag = pow(msg.linear_acceleration.y,2-self.gy)+pow(msg.linear_acceleration.z,2-self.gz)
+    am = -sign(msg.linear_acceleration.z)*sqrt(amag) # Watch out for ramps, etc
     print am'''
-    am = -msg.linear_acceleration.z-0.17
-    print am
+    
+    
+    
+    am = -msg.linear_acceleration.z-self.gz
+    if(abs(self.cmd.linear.x) < 0.01 and abs(self.x[3]) < .1):
+      zp[0,1] = 0.0
+      am = 0.0
     
     z = array([wm, am]).T
     
-    R = diagflat(array([0.1, 0.1]))
-    y = z - self.sensor_prediction()
+    R = diagflat(array([self.qgyro, self.qaccel]))
+    y = z - zp
     S = dot(dot(self.H,self.P),self.H.T) + R
     K = dot(dot(self.P,self.H.T),linalg.pinv(S))
     self.x = self.x + dot(K,y.T)
@@ -218,7 +227,8 @@ class EKF:
 
 
 if __name__ == '__main__':
-	try:
-	  myEKF = EKF(None)
+  rospy.init_node('otto_ekf')
+  try:
+    myEKF = EKF(None)
 
-	except rospy.ROSInterruptException: pass
+  except rospy.ROSInterruptException: pass
