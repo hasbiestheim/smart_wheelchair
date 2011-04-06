@@ -10,7 +10,6 @@
   <url>http://ros.org/wiki/nxt_rviz_plugin</url>
   <depend package="rviz"/>
   <depend package="roscpp"/>
-  <depend package="sonar_joy"/>
   <depend package="tf"/>
 
   <export>
