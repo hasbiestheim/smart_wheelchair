@@ -147,7 +147,7 @@ void NXTUltrasonicDisplay::update(float wall_dt, float ros_dt)
 }
 
 
-void NXTUltrasonicDisplay::processMessage(const sonar_joy::Sonar::ConstPtr& msg)
+void NXTUltrasonicDisplay::processMessage(const sensor_msgs::Range::ConstPtr& msg)
 {
   if (!msg)
   {
@@ -178,14 +178,14 @@ void NXTUltrasonicDisplay::processMessage(const sonar_joy::Sonar::ConstPtr& msg)
 
   cone_->setPosition(position);
   cone_->setOrientation(orientation); 
-  Ogre::Vector3 scale( sin(msg->beam_angle) * msg->range, sin(msg->beam_angle) * msg->range , msg->range);
+  Ogre::Vector3 scale( sin(msg->field_of_view) * msg->range, sin(msg->field_of_view) * msg->range , msg->range);
   rviz::scaleRobotToOgre( scale );
   cone_->setScale(scale);
   cone_->setColor(color_.r_, color_.g_, color_.b_, alpha_);
 
 }
 
-void NXTUltrasonicDisplay::incomingMessage(const sonar_joy::Sonar::ConstPtr& msg)
+void NXTUltrasonicDisplay::incomingMessage(const sensor_msgs::Range::ConstPtr& msg)
 {
   processMessage(msg);
 }
@@ -202,7 +202,7 @@ void NXTUltrasonicDisplay::createProperties()
                                                                                 boost::bind( &NXTUltrasonicDisplay::setTopic, this, _1 ), parent_category_, this );
   setPropertyHelpText(topic_property_, "nxt_msgs::Ranger topic to subscribe to.");
   rviz::ROSTopicStringPropertyPtr topic_prop = topic_property_.lock();
-  topic_prop->setMessageType(ros::message_traits::datatype<sonar_joy::Sonar>());
+  topic_prop->setMessageType(ros::message_traits::datatype<sensor_msgs::Range>());
   color_property_ = property_manager_->createProperty<rviz::ColorProperty>( "Color", property_prefix_, boost::bind( &NXTUltrasonicDisplay::getColor, this ),
                                                                       boost::bind( &NXTUltrasonicDisplay::setColor, this, _1 ), parent_category_, this );
   setPropertyHelpText(color_property_, "Color to draw the range.");

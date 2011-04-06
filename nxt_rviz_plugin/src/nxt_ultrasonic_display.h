@@ -35,7 +35,7 @@
 #include "rviz/helpers/color.h"
 #include "rviz/properties/forwards.h"
 
-#include <sonar_joy/Sonar.h>
+#include <sensor_msgs/Range.h>
 
 #include <message_filters/subscriber.h>
 #include <tf/message_filter.h>
@@ -85,7 +85,7 @@ public:
   virtual void update(float wall_dt, float ros_dt);
   virtual void reset();
 
-  static const char* getTypeStatic() { return "Sonar"; }
+  static const char* getTypeStatic() { return "Range"; }
   virtual const char* getType() const { return getTypeStatic(); }
   static const char* getDescription();
 
@@ -93,8 +93,8 @@ protected:
   void subscribe();
   void unsubscribe();
   void clear();
-  void incomingMessage(const sonar_joy::Sonar::ConstPtr& msg);
-  void processMessage(const sonar_joy::Sonar::ConstPtr& msg);
+  void incomingMessage(const sensor_msgs::Range::ConstPtr& msg);
+  void processMessage(const sensor_msgs::Range::ConstPtr& msg);
 
   // overrides from Display
   virtual void onEnable();
@@ -110,9 +110,9 @@ protected:
   Ogre::SceneNode* scene_node_;
   std::vector<ogre_tools::Shape* > cones_;      ///< Handles actually drawing the cone
 
-  message_filters::Subscriber<sonar_joy::Sonar> sub_;
-  tf::MessageFilter<sonar_joy::Sonar> tf_filter_;
-  sonar_joy::Sonar::ConstPtr current_message_;
+  message_filters::Subscriber<sensor_msgs::Range> sub_;
+  tf::MessageFilter<sensor_msgs::Range> tf_filter_;
+  sensor_msgs::Range::ConstPtr current_message_;
 
   rviz::ColorPropertyWPtr color_property_;
   rviz::ROSTopicStringPropertyWPtr topic_property_;
