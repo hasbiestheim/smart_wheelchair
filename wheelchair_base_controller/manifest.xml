@@ -4,15 +4,18 @@
      wheelchair_base_controller
 
   </description>
-  <author>Eric Perko</author>
+  <author>Chad Rockey</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/wheelchair_base_controller</url>
   <depend package="roscpp"/>
   <depend package="rospy"/>
   <depend package="std_msgs"/>
+  <depend package="std_srvs"/>
   <depend package="tf"/>
   <depend package="joy"/>
+  <depend package="geometry_msgs"/>
+  <depend package="nav_msgs"/>
 
   <rosdep name="python-serial" />
 

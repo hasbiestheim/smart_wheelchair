@@ -1,0 +1,1 @@
+SUBSYSTEMS=="usb", KERNEL=="ttyACM[0-9]*", ATTRS{manufacturer}=="Hokuyo Data Flex for USB", ATTRS{product}=="URG-Series USB Driver", PROGRAM=="/etc/ros/run.sh hokuyo_node getID %N q", SYMLINK+="sensors/hokuyo_%c"

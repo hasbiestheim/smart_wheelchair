@@ -1,0 +1,20 @@
+Process_Noise:
+  qXY: 1828
+  qR: 1e-8
+  qP: 1e-8
+  qW: 1e-8
+  qV: 0.001
+  qRp: 1.0
+  qPp: 1.0
+  qWp: 0.10
+  qA: 0.10
+
+Measurement_Noise:
+  gXVar: 0.1
+  gYVar: 0.1
+  gZvar: 0.1
+  aXVar: 0.3
+  aYVar: 0.3
+  aZVar: 0.3
+
+dt: 0.02

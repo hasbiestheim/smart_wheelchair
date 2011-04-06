@@ -1,13 +1,13 @@
 <package>
-  <description brief="nxt_rviz_plugin">
+  <description brief="ranger_rviz_plugin">
 
-     nxt_rviz_plugin provides plugins for rviz for visualizing data coming from the nxt sensors. 
+     ranger_rviz_plugin provides plugins for rviz for visualizing data coming from the rangers. 
 
   </description>
-  <author>Melonee Wise</author>
+  <author>Melonee Wise, Chad Rockey</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/nxt_rviz_plugin</url>
+  <url>http://ros.org/wiki/ranger_rviz_plugin</url>
   <depend package="rviz"/>
   <depend package="roscpp"/>
   <depend package="tf"/>
