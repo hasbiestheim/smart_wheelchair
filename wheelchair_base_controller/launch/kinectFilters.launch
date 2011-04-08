@@ -2,19 +2,17 @@
    <node pkg="nodelet" type="nodelet" name="kinect_manager" args="manager" output="screen" />
 
   <node pkg="nodelet" type="nodelet" name="kinect_driver" args="load openni_camera/OpenNINodelet kinect_manager" output="screen">
-	  <rosparam command="load" file="$(find openni_camera)/info/openni_params.yaml" />
-	  <rosparam>
-		device_id: #1
-		rgb_frame_id: openni_rgb_optical_frame
-		depth_frame_id: openni_depth_optical_frame
-		use_indices: false
-		depth_registration: true
-		image_mode: 5
-		depth_mode: 5
-		debayering: 2
-		depth_time_offset: 0
-		image_time_offset: 0
-	  </rosparam>
+    <param name="device_id" value="#1"/> <!-- this line uses first enumerated device -->
+    <rosparam command="load" file="$(find openni_camera)/info/openni_params.yaml" />
+    <param name="rgb_frame_id" value="/openni_rgb_optical_frame" />
+    <param name="depth_frame_id" value="/openni_depth_optical_frame" />
+    <param name="use_indices" value="false" />
+    <param name="depth_registration" value="true" />
+    <param name="image_mode" value="5" />
+    <param name="depth_mode" value="5" />
+    <param name="debayering" value="2" />
+    <param name="depth_time_offset" value="0" />
+    <param name="image_time_offset" value="0" />
   </node>
 
   <include file="$(find openni_camera)/launch/kinect_frames.launch" />
