@@ -12,6 +12,11 @@
 		<param name="port_name" value="/dev/sensors/ftdi_A900ceGt" />
 	</node>
 
+	<node pkg="xv_11_laser_driver" type="neato_laser_publisher" name="neatoReader" output="screen">
+		<param name="port" value="/dev/sensors/ftdi_A600e1pa" />
+		<param name="frame_id" value="neato_laser" />
+	</node>
+
 	<!--node pkg="joy" type="joy_node" name="joy_node">
 		<param name="autorepeat_rate" value="20.0" />
 		<param name="dev" type="string" value="/dev/input/js2" />
@@ -29,4 +34,6 @@
 	<node pkg="tf" type="static_transform_publisher" name="diagRightSonarTF" args="0.4953 -0.2286 0.4064 -0.785398163 0 0 base_link diagRightSonar 100" />
 
 	<node pkg="tf" type="static_transform_publisher" name="sideRightSonarTF" args="0.4572 -0.2286 0.4064 -1.57079633 0 0 base_link sideRightSonar 100" />
+
+	<node pkg="tf" type="static_transform_publisher" name="neatoPub" args="0.2667 0 0.0508 3.14159265358979 0 3.14159265358979 base_link neato_laser 100" />
 </launch>

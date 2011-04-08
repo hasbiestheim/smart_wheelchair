@@ -1,0 +1,68 @@
+<launch>
+   <node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen" />
+
+  <include file="$(find openni_camera)/launch/openni_node.launch" />
+
+  <node pkg="nodelet" type="nodelet" name="passthrough_z_cam" args="load pcl/PassThrough pcl_manager" output="screen">
+    <remap from="~input" to="/camera/rgb/points" />
+    <remap from="~output" to="/camera/rgb/points_z_filtered" />
+    <!--remap from="~input_frame" to="/base_link" /-->
+    <rosparam>
+      filter_field_name: z
+      filter_limit_min: 0.0
+      filter_limit_max: 2.0
+      filter_limit_negative: False
+    </rosparam>
+  </node>
+
+  <node pkg="nodelet" type="nodelet" name="passthrough_y_cam" args="load pcl/PassThrough pcl_manager" output="screen">
+    <remap from="~input" to="/camera/rgb/points_z_filtered" />
+    <remap from="~output" to="/camera/rgb/points_zy_filtered" />
+    <!--remap from="~input_frame" to="/base_link" /-->
+    <rosparam>
+      filter_field_name: y
+      filter_limit_min: -1.0
+      filter_limit_max: 1.0
+      filter_limit_negative: False
+    </rosparam>
+  </node>
+
+  <node pkg="nodelet" type="nodelet" name="voxel_grid_z" args="load pcl/VoxelGrid pcl_manager" output="screen">
+    <remap from="~input" to="/camera/rgb/points" />
+    <remap from="~output" to="/camera/rgb/points_voxel_z" />
+    <rosparam>
+      filter_field_name: z
+      filter_limit_min: 0.01
+      filter_limit_max: 5.0
+      filter_limit_negative: False
+      leaf_size: 0.01
+    </rosparam>
+  </node>
+
+  <node pkg="nodelet" type="nodelet" name="voxel_grid_y" args="load pcl/VoxelGrid pcl_manager" output="screen">
+    <remap from="~input" to="/camera/rgb/points_voxel_z" />
+    <remap from="~output" to="/camera/rgb/points_voxel_zy" />
+    <rosparam>
+      filter_field_name: y
+      filter_limit_min: -5.0
+      filter_limit_max: 5.0
+      filter_limit_negative: False
+      leaf_size: 0.01
+    </rosparam>
+  </node>
+
+  <node pkg="nodelet" type="nodelet" name="voxel_grid_x" args="load pcl/VoxelGrid pcl_manager" output="screen">
+    <remap from="~input" to="/camera/rgb/points_voxel_zy" />
+    <remap from="~output" to="/camera/rgb/points_voxel_zyx" />
+    <rosparam>
+      filter_field_name: x
+      filter_limit_min: -5.0
+      filter_limit_max: 5.0
+      filter_limit_negative: False
+      leaf_size: 0.01
+    </rosparam>
+  </node>
+
+  <node pkg="tf" type="static_transform_publisher" name="kinectTFPub" args="0.1651 0 1.7272 0 0.174532925 0 base_link openni_camera 100" />
+
+</launch>
