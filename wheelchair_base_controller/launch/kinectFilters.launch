@@ -1,9 +1,25 @@
 <launch>
-   <node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen" />
+   <node pkg="nodelet" type="nodelet" name="kinect_manager" args="manager" output="screen" />
 
-  <include file="$(find openni_camera)/launch/openni_node.launch" />
+  <node pkg="nodelet" type="nodelet" name="kinect_driver" args="load openni_camera/OpenNINodelet kinect_manager" output="screen">
+	  <rosparam command="load" file="$(find openni_camera)/info/openni_params.yaml" />
+	  <rosparam>
+		device_id: #1
+		rgb_frame_id: openni_rgb_optical_frame
+		depth_frame_id: openni_depth_optical_frame
+		use_indices: false
+		depth_registration: true
+		image_mode: 5
+		depth_mode: 5
+		debayering: 2
+		depth_time_offset: 0
+		image_time_offset: 0
+	  </rosparam>
+  </node>
 
-  <node pkg="nodelet" type="nodelet" name="passthrough_z_cam" args="load pcl/PassThrough pcl_manager" output="screen">
+  <include file="$(find openni_camera)/launch/kinect_frames.launch" />
+
+  <node pkg="nodelet" type="nodelet" name="passthrough_z_cam" args="load pcl/PassThrough kinect_manager" output="screen">
     <remap from="~input" to="/camera/rgb/points" />
     <remap from="~output" to="/camera/rgb/points_z_filtered" />
     <!--remap from="~input_frame" to="/base_link" /-->
@@ -15,7 +31,7 @@
     </rosparam>
   </node>
 
-  <node pkg="nodelet" type="nodelet" name="passthrough_y_cam" args="load pcl/PassThrough pcl_manager" output="screen">
+  <node pkg="nodelet" type="nodelet" name="passthrough_y_cam" args="load pcl/PassThrough kinect_manager" output="screen">
     <remap from="~input" to="/camera/rgb/points_z_filtered" />
     <remap from="~output" to="/camera/rgb/points_zy_filtered" />
     <!--remap from="~input_frame" to="/base_link" /-->
@@ -27,7 +43,7 @@
     </rosparam>
   </node>
 
-  <node pkg="nodelet" type="nodelet" name="voxel_grid_z" args="load pcl/VoxelGrid pcl_manager" output="screen">
+  <node pkg="nodelet" type="nodelet" name="voxel_grid_z" args="load pcl/VoxelGrid kinect_manager" output="screen">
     <remap from="~input" to="/camera/rgb/points" />
     <remap from="~output" to="/camera/rgb/points_voxel_z" />
     <rosparam>
@@ -39,7 +55,7 @@
     </rosparam>
   </node>
 
-  <node pkg="nodelet" type="nodelet" name="voxel_grid_y" args="load pcl/VoxelGrid pcl_manager" output="screen">
+  <node pkg="nodelet" type="nodelet" name="voxel_grid_y" args="load pcl/VoxelGrid kinect_manager" output="screen">
     <remap from="~input" to="/camera/rgb/points_voxel_z" />
     <remap from="~output" to="/camera/rgb/points_voxel_zy" />
     <rosparam>
@@ -51,7 +67,7 @@
     </rosparam>
   </node>
 
-  <node pkg="nodelet" type="nodelet" name="voxel_grid_x" args="load pcl/VoxelGrid pcl_manager" output="screen">
+  <node pkg="nodelet" type="nodelet" name="voxel_grid_x" args="load pcl/VoxelGrid kinect_manager" output="screen">
     <remap from="~input" to="/camera/rgb/points_voxel_zy" />
     <remap from="~output" to="/camera/rgb/points_voxel_zyx" />
     <rosparam>
