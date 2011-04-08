@@ -15,7 +15,10 @@
   <depend package="tf"/>
   <depend package="joy"/>
   <depend package="geometry_msgs"/>
+  <depend package="sensor_msgs"/>
   <depend package="nav_msgs"/>
+  <depend package="pcl_ros"/>
+  <depend package="pcl"/>
 
   <rosdep name="python-serial" />
 

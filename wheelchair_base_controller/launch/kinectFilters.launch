@@ -1,7 +1,8 @@
 <launch>
    <node pkg="nodelet" type="nodelet" name="kinect_manager" args="manager" output="screen" />
 
-  <node pkg="nodelet" type="nodelet" name="kinect_driver" args="load openni_camera/OpenNINodelet kinect_manager" output="screen">
+  <!--node pkg="nodelet" type="nodelet" name="kinect_driver" args="load openni_camera/OpenNINodelet kinect_manager" output="screen"-->
+  <node pkg="openni_camera" type="openni_node" name="kinect_driver" output="screen">
     <param name="device_id" value="#1"/> <!-- this line uses first enumerated device -->
     <rosparam command="load" file="$(find openni_camera)/info/openni_params.yaml" />
     <param name="rgb_frame_id" value="/openni_rgb_optical_frame" />
@@ -10,7 +11,7 @@
     <param name="depth_registration" value="true" />
     <param name="image_mode" value="5" />
     <param name="depth_mode" value="5" />
-    <param name="debayering" value="2" />
+    <param name="debayering" value="0" />
     <param name="depth_time_offset" value="0" />
     <param name="image_time_offset" value="0" />
   </node>
@@ -49,7 +50,7 @@
       filter_limit_min: 0.01
       filter_limit_max: 5.0
       filter_limit_negative: False
-      leaf_size: 0.01
+      leaf_size: 0.03
     </rosparam>
   </node>
 
@@ -61,19 +62,7 @@
       filter_limit_min: -5.0
       filter_limit_max: 5.0
       filter_limit_negative: False
-      leaf_size: 0.01
-    </rosparam>
-  </node>
-
-  <node pkg="nodelet" type="nodelet" name="voxel_grid_x" args="load pcl/VoxelGrid kinect_manager" output="screen">
-    <remap from="~input" to="/camera/rgb/points_voxel_zy" />
-    <remap from="~output" to="/camera/rgb/points_voxel_zyx" />
-    <rosparam>
-      filter_field_name: x
-      filter_limit_min: -5.0
-      filter_limit_max: 5.0
-      filter_limit_negative: False
-      leaf_size: 0.01
+      leaf_size: 0.03
     </rosparam>
   </node>
 
