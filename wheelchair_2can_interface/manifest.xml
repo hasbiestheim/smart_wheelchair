@@ -1,0 +1,15 @@
+<package>
+  <description brief="wheelchair_2can_interface">
+
+     wheelchair_2can_interface
+
+  </description>
+  <author>Eric Perko</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/wheelchair_2can_interface</url>
+  <depend package="rospy"/>
+
+</package>
+
+
