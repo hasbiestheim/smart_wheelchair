@@ -1,3 +1,4 @@
+#include "ros/ros.h"
 #include "2CANObjects.h"
 
 #include <string.h> // For memset???
@@ -137,6 +138,9 @@ void ProcessHeartBeat()
 }
 
 int main(int argc, char *argv[]) {
+  ros::init(argc, argv, "send2CANMessages");
+  ros::NodeHandle n;
+  
   //CANTxSocket = new TxUDPSocket(m_sIP,1217,0);
   //CANRxSocket = new RxUDPSocket(m_sIP,1218,0);
   
@@ -154,19 +158,55 @@ int main(int argc, char *argv[]) {
     /*ProcessHeartBeat();
     socket.send_to(boost::asio::buffer((char*)&enableOut,sizeof(enableOut)), receiver_endpoint);*/
     
-    // Send TX
-    uint32_t myMessageID = 0xBEEF;
-    const uint8_t myData [8] = {1, 0x02, 3, 0x04, 5, 0x06, 7, 0x08};
-    sendMessage(myMessageID, myData, sizeof(myData));
+    // Get a packet from the 2CAN, and then start sending
+    boost::array<char, 128> recv_buf; 
+    udp::endpoint from2CAN_endpoint(boost::asio::ip::address::from_string("127.0.0.1"), 1218);
+    //size_t len = socket.receive_from(boost::asio::buffer(recv_buf), from2CAN_endpoint);
+
+    // Start attendent emulation by sending initialization packets
+    ///36865: a0 00 51 00 27 [11(00)]
+    uint32_t myMessageID = 36865;
+    const uint8_t myData0 [8] = {0xa0, 0x00, 0x51, 0x00, 0x27, 0x00, 0x00, 0x00};
+    sendMessage(myMessageID, myData0, sizeof(myData0));
+    socket.send_to(boost::asio::buffer((char*)&TXPacketToSend,sizeof(TXPacketToSend)), receiver_endpoint);
+    ///13697184: 81 00 80 00 aa 00 55 [9(00)]
+    myMessageID = 13697184;
+    const uint8_t myData1 [8] = {0x81, 0x00, 0x80, 0x00, 0xaa, 0x00, 0x55, 0x00};
+    sendMessage(myMessageID, myData1, sizeof(myData1));
+    socket.send_to(boost::asio::buffer((char*)&TXPacketToSend,sizeof(TXPacketToSend)), receiver_endpoint);
+    ///13701121: a0 00 02 00 03 00 00 00 02 [7(00)]
+    // UHHHHH, why do I have 9 bytes here???  Uh oh
+    myMessageID = 13701121;
+    const uint8_t myData2 [8] = {0xa0, 0x00, 0x02, 0x00, 0x03, 0x00, 0x00, 0x00};//, 0x02};
+    sendMessage(myMessageID, myData2, sizeof(myData2));
     socket.send_to(boost::asio::buffer((char*)&TXPacketToSend,sizeof(TXPacketToSend)), receiver_endpoint);
     
-    //boost::array<char, 128> recv_buf;
-     
-    /*udp::endpoint sender_endpoint;
-    size_t len = socket.receive_from(
-        boost::asio::buffer(recv_buf), sender_endpoint);
-
-    std::cout.write(recv_buf.data(), len);*/
+    ros::Rate loop_rate(1000);
+    
+    // Now send packets at 1000Hz, and once every second, send the hearbeat
+    while(ros::ok()){
+      for(int i = 0; i < 2000; i++){
+	if(i % 1000 == 0){
+	  if(i == 0){
+	    ///69633: ff 00 80 aa 00 55 [9(00)]
+	    uint32_t myMessageID = 69633;
+	    const uint8_t myData [8] = {0xff, 0x00, 0x80, 0xaa, 0x00, 0x55, 0x00, 0x00};
+	    sendMessage(myMessageID, myData, sizeof(myData));
+	    socket.send_to(boost::asio::buffer((char*)&TXPacketToSend,sizeof(TXPacketToSend)), receiver_endpoint);
+	  } else {
+	    ///69633: ff 00 80 55 00 aa [9(00)]
+	    uint32_t myMessageID = 69633;
+	    const uint8_t myData [8] = {0xff, 0x00, 0x80, 0x55, 0x00, 0xaa, 0x00, 0x00};
+	    sendMessage(myMessageID, myData, sizeof(myData));
+	    socket.send_to(boost::asio::buffer((char*)&TXPacketToSend,sizeof(TXPacketToSend)), receiver_endpoint);
+	  }
+	}
+	
+	
+	// Sleep so that we meet the 1000Hz rate
+	loop_rate.sleep();
+      }
+    }
     
   } catch(std::exception& e) {
     std::cerr << e.what() << std::endl;
