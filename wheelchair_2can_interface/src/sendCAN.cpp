@@ -2,7 +2,14 @@
 
 #include <string.h> // For memset???
 
+#include <iostream>
+#include <boost/array.hpp>
+#include <boost/asio.hpp>
+
+using boost::asio::ip::udp;
+
 TxCANPacket TXPacketToSend;
+EnablePacket enableOut;
 
 unsigned short CheckSum(unsigned short * data, unsigned long byte_len) 
 {
@@ -114,7 +121,6 @@ void ProcessHeartBeat()
 
   // 2CAN firmware 2.0 and on uses 'robot state' to control LEDs
   //Send the enable datagram to the 2CAN.  This is what controls the LED status.
-  EnablePacket enableOut;
   memset((void*)&enableOut,0,sizeof(enableOut));
   enableOut.enableState = 2;//_robotState;
   enableOut.iSig = 0xAAAC;
@@ -134,8 +140,37 @@ int main(int argc, char *argv[]) {
   //CANTxSocket = new TxUDPSocket(m_sIP,1217,0);
   //CANRxSocket = new RxUDPSocket(m_sIP,1218,0);
   
-  // Concerned about memory leaks
-  
   // Need to figure out how to create sockets and then use them
+  try
+  {
+    boost::asio::io_service io_service;
+    udp::resolver resolver(io_service);
+    udp::endpoint receiver_endpoint(boost::asio::ip::address::from_string("172.0.0.42"), 1217);
+    
+    udp::socket socket(io_service);
+    socket.open(udp::v4());
+    
+    // Send heartbeat
+    /*ProcessHeartBeat();
+    socket.send_to(boost::asio::buffer((char*)&enableOut,sizeof(enableOut)), receiver_endpoint);*/
+    
+    // Send TX
+    uint32_t myMessageID = 0xBEEF;
+    const uint8_t myData [8] = {1, 0x02, 3, 0x04, 5, 0x06, 7, 0x08};
+    sendMessage(myMessageID, myData, sizeof(myData));
+    socket.send_to(boost::asio::buffer((char*)&TXPacketToSend,sizeof(TXPacketToSend)), receiver_endpoint);
+    
+    //boost::array<char, 128> recv_buf;
+     
+    /*udp::endpoint sender_endpoint;
+    size_t len = socket.receive_from(
+        boost::asio::buffer(recv_buf), sender_endpoint);
+
+    std::cout.write(recv_buf.data(), len);*/
+    
+  } catch(std::exception& e) {
+    std::cerr << e.what() << std::endl;
+  }
+  
   return 0;
 }

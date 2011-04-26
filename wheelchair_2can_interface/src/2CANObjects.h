@@ -25,7 +25,7 @@ typedef union TxCANPacket { // 44 bytes
 } TxCANPacket;
 
 
-typedef union EnablePacket
+typedef union EnablePacket // 24 bytes?
 {
 	struct
 	{
