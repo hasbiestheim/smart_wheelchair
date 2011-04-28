@@ -62,3 +62,6 @@ typedef union _RxCANPacket { //42 bytes (the Words[20] creates 10 bytes of paddi
 		uint16_t iCRC;
 	};
 } RxCANPacket;
+
+// A whole bunch of packet structures
+const uint8_t  [9] = {0xa0, 0x00, 0x51, 0x00, 0x27, 0x00, 0x00, 0x00, 0x00};

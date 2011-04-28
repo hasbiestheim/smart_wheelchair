@@ -172,7 +172,7 @@ void TXandHeartBeat(){
     // Start attendent emulation by sending initialization packets
     ///36865: a0 00 51 00 27 [11(00)]
     uint32_t myMessageID = 36865;
-    const uint8_t myData0 [9] = {0xa0, 0x00, 0x51, 0x00, 0x27, 0x00, 0x00, 0x00, 0x00};
+    
     sendMessage(myMessageID, myData0, sizeof(myData0));
     socket.send_to(boost::asio::buffer((char*)&TXPacketToSend,sizeof(TXPacketToSend)), receiver_endpoint);
     ///13697184: 81 00 80 00 aa 00 55 [9(00)]
@@ -224,33 +224,15 @@ void TXandHeartBeat(){
       for(int i = 0; i < 2000; i++){
 	// Check if we need to send heartbeat for 2CAN
 	if(i % 20 == 0){
-	  ProcessHeartBeat();
 	  socket.send_to(boost::asio::buffer((char*)&enableOut,sizeof(enableOut)), receiver_endpoint);
-	}
-	
-	// Send keep-alive for attendent
-	if(i % 1000 == 0){
-	  if(i == 0){
-	    ///69633: ff 00 80 aa 00 55 [9(00)]
-	    uint32_t myMessageID = 69633;
-	    const uint8_t myData [9] = {0xff, 0x00, 0x80, 0x00, 0xaa, 0x00, 0x55, 0x00, 0x00};
-	    sendMessage(myMessageID, myData, sizeof(myData));
-	    socket.send_to(boost::asio::buffer((char*)&TXPacketToSend,sizeof(TXPacketToSend)), receiver_endpoint);
-	  } else {
-	    ///69633: ff 00 80 55 00 aa [9(00)]
-	    uint32_t myMessageID = 69633;
-	    const uint8_t myData [9] = {0xff, 0x00, 0x80, 0x00, 0x55, 0x00, 0xaa, 0x00, 0x00};
-	    sendMessage(myMessageID, myData, sizeof(myData));
-	    socket.send_to(boost::asio::buffer((char*)&TXPacketToSend,sizeof(TXPacketToSend)), receiver_endpoint);
-	  }
 	}
 	
 	// Every time send a command!
 	///3215361: a0 00 80 00 80 00 FF 00
-	uint32_t myMessageID = 3215361;
+	/*uint32_t myMessageID = 3215361;
 	const uint8_t myData0 [9] = {0xa0, 0x00, 0x80, 0x00, 0x80, 0x00, 0xFF, 0x00, 0x00};
 	sendMessage(myMessageID, myData0, sizeof(myData0));
-	socket.send_to(boost::asio::buffer((char*)&TXPacketToSend,sizeof(TXPacketToSend)), receiver_endpoint);
+	socket.send_to(boost::asio::buffer((char*)&TXPacketToSend,sizeof(TXPacketToSend)), receiver_endpoint);*/
 	
 	// Sleep so that we meet the 1000Hz rate
 	loop_rate.sleep();
