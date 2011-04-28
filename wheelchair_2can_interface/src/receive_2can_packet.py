@@ -41,7 +41,9 @@ typedef struct _STo2CAN_CANFrame // 22 bytes
 can_frame_fmt_string = "<HHH16s"
 
 def make_pretty_hex(raw_string):
-    return raw_string
+    hexes =  ['%02x' % ord(c) for c in raw_string]
+    hex_string = " ".join(hexes)
+    return hex_string
 
 def print_arbid_dict(std_scr, can_dict):
     x = 0
@@ -65,30 +67,35 @@ def main(std_scr):
     incomingUDP.bind(('', 1218))
 
     can_dict = {}
+    initial_time = None
+    with open("can_frames.txt", "w") as f:
+      f.write("%010s: %015s: %50s\n" % ("Time (ms)", "ARBID", "Data"))
+      while True:
+	  data, addr = incomingUDP.recvfrom(1500)
+	  num_bytes_received = len(data)
+	  #struct.unpack(rx_can_packet_fmt_string, 
+	  if num_bytes_received > 0:
+	      if num_bytes_received == struct.calcsize(rx_can_packet_fmt_string):
+		  #SIG_RX_CAN_FRAMES = 0xAAA2
+		  rx_frame = struct.unpack(rx_can_packet_fmt_string, data)
+		  if rx_frame[0] == 0xAAA2:
+		      #Good packet... passed lots of checks
+		      can_frame_bytes = rx_frame[4]
+		      can_frame = struct.unpack(can_frame_fmt_string, can_frame_bytes)
+		      arbid = (can_frame[0] << 16) + can_frame[1]
+		      can_dict[arbid] = (can_frame[3], time.time())
+		      if not initial_time:
+			initial_time = time.time()
+		      f.write("%010.2f: %015s: %50s\n" % ((time.time()-initial_time)*1000, arbid, make_pretty_hex(can_frame[3])))
+		  else:
+		      print "Can Frame Header wrong"
+	      else:
+		  print "Wrong Number of bytes received"
+	  else:
+	      print "0 bytes received"
 
-    while True:
-        data, addr = incomingUDP.recvfrom(1500)
-        num_bytes_received = len(data)
-        #struct.unpack(rx_can_packet_fmt_string, 
-        if num_bytes_received > 0:
-            if num_bytes_received == struct.calcsize(rx_can_packet_fmt_string):
-                #SIG_RX_CAN_FRAMES = 0xAAA2
-                rx_frame = struct.unpack(rx_can_packet_fmt_string, data)
-                if rx_frame[0] == 0xAAA2:
-                    #Good packet... passed lots of checks
-                    can_frame_bytes = rx_frame[4]
-                    can_frame = struct.unpack(can_frame_fmt_string, can_frame_bytes)
-                    arbid = (can_frame[0] << 16) + can_frame[1]
-                    can_dict[arbid] = (make_pretty_hex(can_frame[3]), time.time())
-                else:
-                    print "Can Frame Header wrong"
-            else:
-                print "Wrong Number of bytes received"
-        else:
-            print "0 bytes received"
-
-        #Print out the arbid dict
-        print_arbid_dict(std_scr, can_dict)
+	  #Print out the arbid dict
+	  print_arbid_dict(std_scr, can_dict)
 
     incomingUDP.close()
 
