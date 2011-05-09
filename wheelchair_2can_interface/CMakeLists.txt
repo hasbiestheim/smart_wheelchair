@@ -22,9 +22,9 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_gensrv()
 
 #common commands for building c++ executables and libraries
-#rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
+rosbuild_add_library(wheelchair_2can_interface src/CANManger.cpp)
 #target_link_libraries(${PROJECT_NAME} another_library)
 #rosbuild_add_boost_directories()
 rosbuild_add_executable(sendCAN src/sendCAN.cpp)
 rosbuild_link_boost(sendCAN system)
-#target_link_libraries(example ${PROJECT_NAME})
+target_link_libraries(sendCAN wheelchair_2can_interface)
