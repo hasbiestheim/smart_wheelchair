@@ -1,6 +1,6 @@
-const int throttle_pwm_pin = 8;
-const int steering_pwm_pin = 9;
-const int speed_control_pwm_pin = 10;
+const int throttle_pwm_pin = 9;
+const int steering_pwm_pin = 10;
+const int speed_control_pwm_pin = 11;
 
 const int throttle_read_pin = 1;
 const int steering_read_pin = 0;
