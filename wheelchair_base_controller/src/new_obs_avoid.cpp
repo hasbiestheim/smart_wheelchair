@@ -16,10 +16,10 @@ int rearLaserDist = 1.3;
 
 int numberOfLaserBeams = 360;
 
-float rangeFrontThreshold = 0.30;
-float rangeSideThreshold = 0.20;
+float rangeFrontThreshold = 0.51;
+float rangeSideThreshold = 0.44;
 
-int kinectPoints = 100;
+int kinectPoints = 1000;
 
 // CALLBACKS
 
@@ -43,7 +43,7 @@ void laserCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
 		}
 
 		float beamRange = msg->ranges[frontLaserCenter + i];
-		if(beamRange < frontLaserDist && beamRange > minRange){
+		if((beamRange < frontLaserDist) && (beamRange > minRange)){
 			laserFrontAllow = false;  // Oops, found a dangerous return
 			ROS_DEBUG("Danger according to Front Laser");
 			break;
@@ -62,7 +62,7 @@ void laserCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
 		}
 
 		float beamRange = msg->ranges[checkNum];
-		if(beamRange < rearLaserDist && beamRange > minRange){
+		if((beamRange < rearLaserDist) && (beamRange > minRange)){
 			laserRearAllow = false;  // Oops, found a dangerous return
 			ROS_DEBUG("Danger according to Rear Laser");
 			break;
@@ -122,6 +122,8 @@ void pointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& cloud)
 	if((int)currentPoints > kinectPoints){
 		kinectAllow = false;
 		ROS_DEBUG("Danger according to Front Kinect");
+	} else {
+		kinectAllow = true;
 	}
 }
 
@@ -137,16 +139,16 @@ void joyCallback(const joy::Joy::ConstPtr& msg)
 	newJoy.axes = msg->axes;
 	newJoy.buttons = msg->buttons;
 
-	if((!laserFrontAllow || !rangerFrontAllow || !kinectAllow) && newJoy.axes[1] > 0.0){
+	if((!laserFrontAllow || !rangerFrontAllow || !kinectAllow) && (newJoy.axes[1] > 0.0)){
 		newJoy.axes[1] = 0.0;
 	}
-	if(!laserRearAllow && newJoy.axes[1] < 0.0){
+	if(!laserRearAllow && (newJoy.axes[1] < 0.0)){
 		newJoy.axes[1] = 0.0;
 	}
-	if(!rangerLeftAllow && newJoy.axes[0] > 0.0){
+	if(!rangerLeftAllow && (newJoy.axes[0] > 0.0)){
 		newJoy.axes[0] = 0.0;
 	}
-	if(!rangerRightAllow && newJoy.axes[0] < 0.0){
+	if(!rangerRightAllow && (newJoy.axes[0] < 0.0)){
 		newJoy.axes[0] = 0.0;
 	}
 	
@@ -159,7 +161,7 @@ int main(int argc, char **argv)
   ros::NodeHandle n;
   joyout_pub = n.advertise<joy::Joy>("joy_output", 1);
 
-  ros::Subscriber laser_sub = n.subscribe("scan", 100, laserCallback);
+  //ros::Subscriber laser_sub = n.subscribe("scan", 100, laserCallback);
 
   ros::Subscriber ranger_sub = n.subscribe("sonars", 100, rangeCallback);
 
