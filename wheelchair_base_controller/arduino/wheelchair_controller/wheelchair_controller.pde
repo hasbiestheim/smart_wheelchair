@@ -31,7 +31,7 @@ unsigned long time;
 
 void executeCommand() {
   // Run the throttle PID iteration
-  int err = throttle_command-(analogRead(THROTTLE_READ_PIN)+9)/4; // Error term, analog offset is to get better neutral position
+  int err = throttle_command-(analogRead(THROTTLE_READ_PIN))/4; // Error term, analog offset is to get better neutral position
   int pTerm = (int) (ktp * err);
   ti = ti + err;
   int iTerm = (int) (kti * ti);
@@ -40,7 +40,7 @@ void executeCommand() {
   analogWrite(THROTTLE_PWM_PIN, outputSaturation(cmd));
   
   // Run the steering PID iteration
-  err = steering_command-(analogRead(STEERING_READ_PIN)+9)/4; // Error term, analog offset is to get better neutral position
+  err = steering_command-(analogRead(STEERING_READ_PIN))/4; // Error term, analog offset is to get better neutral position
   pTerm = (int) (ksp * err);
   si = si + err;
   iTerm = (int) (ksi * si);
