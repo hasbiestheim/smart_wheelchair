@@ -145,14 +145,14 @@ void setup()
   Serial.println("Sparkfun 9DOF Razor AHRS");
 
   digitalWrite(STATUS_LED,LOW);
-  delay(1500);
+  ///delay(1500);
  
   // Magnetometer initialization
   Compass_Init();
   
   // Initialze ADC readings and buffers
   Read_adc_raw();
-  delay(20);
+  ///delay(20);
   
   /*for(int i=0;i<32;i++)    // We take some readings...
     {
@@ -180,7 +180,7 @@ void setup()
   //for(int y=0; y<6; y++)
     //Serial.println(AN_OFFSET[y]);
   
-  delay(2000);
+  ///delay(2000);
   digitalWrite(STATUS_LED,HIGH);
     
   Read_adc_raw();     // ADC initialization
