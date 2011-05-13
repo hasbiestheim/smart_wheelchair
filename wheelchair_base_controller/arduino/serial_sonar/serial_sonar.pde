@@ -50,10 +50,6 @@ void loop() {
     if(sonI >= SONARNUM){
       sonI = 0;
     }
-    sonarStartTimes[sonI] = micros();
-    
-    // Sleep for a whole round to avoid reflecting pings
-    //delay(49);
     
     sonarStartTimes[sonI] = micros();
   } else if((micros()-sonarStartTimes[sonI]) > 50000){
