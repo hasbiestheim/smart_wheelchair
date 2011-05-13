@@ -16,6 +16,8 @@
   <depend package="joy"/>
   <depend package="geometry_msgs"/>
   <depend package="nav_msgs"/>
+  
+  <depend package="phidgets" />
 
   <rosdep name="python-serial" />
 
