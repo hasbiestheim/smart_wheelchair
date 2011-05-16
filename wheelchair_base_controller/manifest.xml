@@ -19,6 +19,10 @@
   <depend package="nav_msgs"/>
   <depend package="pcl_ros"/>
   <depend package="pcl"/>
+  <depend package="driver_base" />
+  <depend package="dynamic_reconfigure" />
+
+  <depend package="octocostmap" />
 
   <rosdep name="python-serial" />
 
