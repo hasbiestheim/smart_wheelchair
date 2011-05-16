@@ -17,15 +17,14 @@ namespace nxt_rviz_plugin
 {
 NXTUltrasonicDisplay::NXTUltrasonicDisplay( const std::string& name, rviz::VisualizationManager* manager )
 : Display( name, manager )
-, color_( 0.1f, 1.0f, 0.0f )
+, color_( 0.0f, 1.0f, 0.0f )
 , messages_received_(0)
 , tf_filter_(*manager->getTFClient(), "", 10, update_nh_)
 {
+  setAlpha( 0.0f );
   scene_node_ = scene_manager_->getRootSceneNode()->createChildSceneNode();
-
   scene_node_->setVisible( false );
-
-  setAlpha( 0.5f );
+  
   setBuffer( 1 );
   Ogre::Vector3 scale( 0, 0, 0);
   rviz::scaleRobotToOgre( scale );
@@ -33,6 +32,7 @@ NXTUltrasonicDisplay::NXTUltrasonicDisplay( const std::string& name, rviz::Visua
   tf_filter_.connectInput(sub_);
   tf_filter_.registerCallback(boost::bind(&NXTUltrasonicDisplay::incomingMessage, this, _1));
   vis_manager_->getFrameManager()->registerFilterForTransformStatusCheck(tf_filter_, this);
+  setAlpha( 0.5f );
 }
 
 NXTUltrasonicDisplay::~NXTUltrasonicDisplay()
@@ -82,17 +82,28 @@ void NXTUltrasonicDisplay::setBuffer( int buffer )
 
   propertyChanged(bufferLen_property_);
   
-  // new ogre_tools::Shape(ogre_tools::Shape::Cone, vis_manager_->getSceneManager(), scene_node_);
-
-  //processMessage(current_message_);
-  //causeRender();
-  
   for (size_t i = 0; i < cones_.size(); i++) {
     delete cones_[i];
   }
   cones_.resize(buffer_len_);
   for (size_t i = 0; i < cones_.size(); i++) {
     cones_[i] = new ogre_tools::Shape(ogre_tools::Shape::Cone, vis_manager_->getSceneManager(), scene_node_);
+    ogre_tools::Shape* cone = cones_[i];
+    
+    Ogre::Vector3 position;
+    Ogre::Quaternion orientation;
+    geometry_msgs::Pose pose;
+    pose.position.z = pose.position.y = 0;
+    pose.position.x = 0;
+    pose.orientation.x = 0;
+    pose.orientation.z = 0;
+    cone->setPosition(position);
+    cone->setOrientation(orientation); 
+    Ogre::Vector3 scale( 0, 0, 0);
+    rviz::scaleRobotToOgre( scale );
+    cone->setScale(scale);
+    cone->setColor(color_.r_, color_.g_, color_.b_, 0);
+    
   }
   
 }
@@ -156,7 +167,7 @@ void NXTUltrasonicDisplay::processMessage(const sensor_msgs::Range::ConstPtr& ms
 
   ++messages_received_;
   
-  ogre_tools::Shape* cone_ = cones_[messages_received_ % buffer_len_];
+  ogre_tools::Shape* cone = cones_[messages_received_ % buffer_len_];
 
   {
     std::stringstream ss;
@@ -176,12 +187,12 @@ void NXTUltrasonicDisplay::processMessage(const sensor_msgs::Range::ConstPtr& ms
     ROS_DEBUG( "Error transforming from frame '%s' to frame '%s'", msg->header.frame_id.c_str(), fixed_frame_.c_str() );
   }
 
-  cone_->setPosition(position);
-  cone_->setOrientation(orientation); 
+  cone->setPosition(position);
+  cone->setOrientation(orientation); 
   Ogre::Vector3 scale( sin(msg->field_of_view) * msg->range, sin(msg->field_of_view) * msg->range , msg->range);
   rviz::scaleRobotToOgre( scale );
-  cone_->setScale(scale);
-  cone_->setColor(color_.r_, color_.g_, color_.b_, alpha_);
+  cone->setScale(scale);
+  cone->setColor(color_.r_, color_.g_, color_.b_, alpha_);
 
 }
 
