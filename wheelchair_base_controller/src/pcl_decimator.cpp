@@ -25,20 +25,25 @@ void pointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& cloud)
   pcl::PassThrough<pcl::PointXYZ> pass;
   pass.setInputCloud (cloud);
   pass.setFilterFieldName (fieldName_);
-  // Do the first one manually so that certain parameters like frame_id always match
-  pass.setFilterLimits (startPoint_, startPoint_+bandWidth_);
-  pass.filter(*cloud_filtered);
-  *output_cloud = *cloud_filtered;
-  
-  
-  float dL = endPoint_-startPoint_;
-  
-  for(int i = 1; i < numBands_; i++){
-    float sLine = startPoint_ + i*dL/numBands_;
-    float eLine = startPoint_ + i*dL/numBands_ + bandWidth_;
-    pass.setFilterLimits (sLine, eLine);
+  if(numBands_ <= 1){ 
+    // Just center it to be nice
+    pass.setFilterLimits ((startPoint_+endPoint_)/2.0, (startPoint_+endPoint_)/2.0+bandWidth_);
     pass.filter(*cloud_filtered);
-    *output_cloud += *cloud_filtered;
+    *output_cloud = *cloud_filtered;
+  } else {
+    // Do the first one manually so that certain parameters like frame_id always match
+    pass.setFilterLimits (startPoint_, startPoint_+bandWidth_);
+    pass.filter(*cloud_filtered);
+    *output_cloud = *cloud_filtered;
+    float dL = endPoint_-startPoint_;
+    
+    for(int i = 1; i < numBands_; i++){
+      float sLine = startPoint_ + i*dL/(float)(numBands_-1);
+      float eLine = sLine + bandWidth_;
+      pass.setFilterLimits (sLine, eLine);
+      pass.filter(*cloud_filtered);
+      *output_cloud += *cloud_filtered;
+    }
   }
   cloudout_pub_.publish(*output_cloud);
 }
