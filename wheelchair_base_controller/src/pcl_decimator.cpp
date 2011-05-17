@@ -53,8 +53,8 @@ void pointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& cloud)
 void callback(wheelchair_base_controller::PCLDecimatorConfig &config, uint32_t level)
 {
   fieldName_ = config.field_name;
-  numBands_ = config.num_bands;
-  bandWidth_ = config.band_width;
+  numBands_ = config.num_slices;
+  bandWidth_ = config.slice_width;
   startPoint_ = config.start_threshold;
   endPoint_ = config.end_threshold;
 }
