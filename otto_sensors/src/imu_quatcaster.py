@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import roslib
-roslib.load_manifest("wheelchair_base_controller")
+roslib.load_manifest("otto_sensors")
 import rospy
 
 from sensor_msgs.msg import Imu

@@ -1,0 +1,14 @@
+<package>
+  <description brief="octoflex">
+
+     octoflex
+
+  </description>
+  <author>Chad Rockey</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/octoflex</url>
+
+</package>
+
+

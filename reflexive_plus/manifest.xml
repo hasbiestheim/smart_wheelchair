@@ -1,0 +1,14 @@
+<package>
+  <description brief="reflexive_plus">
+
+     reflexive_plus
+
+  </description>
+  <author>Chad Rockey</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/reflexive_plus</url>
+
+</package>
+
+

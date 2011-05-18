@@ -1,0 +1,22 @@
+<package>
+  <description brief="reflexive_avoidance">
+
+     reflexive_avoidance
+
+  </description>
+  <author>Chad Rockey</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/reflexive_avoidance</url>
+  
+  <depend package="roscpp"/>
+  <depend package="pcl_ros"/>
+  <depend package="pcl"/>
+  <depend package="sensor_msgs"/>
+  <depend package="geometry_msgs"/>
+  <depend package="std_msgs"/>
+  <depend package="joy"/>
+
+</package>
+
+

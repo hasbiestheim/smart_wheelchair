@@ -1,6 +1,6 @@
 #include <ros/ros.h>
 #include <dynamic_reconfigure/server.h>
-#include <wheelchair_base_controller/PCLDecimatorConfig.h>
+#include <pcl_decimator/PCLDecimatorConfig.h>
 #include <pcl_ros/point_cloud.h>
 #include <pcl/point_types.h>
 
@@ -12,7 +12,7 @@ ros::Publisher cloudout_pub_;
 
 std::string fieldName_ = "y";
 float bandWidth_ = 0.01;
-int numBands_ = 11;
+int numBands_ = 7;
 float startPoint_ = -1.0;
 float endPoint_ = 1.0;
 
@@ -50,7 +50,7 @@ void pointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& cloud)
 
 
 
-void callback(wheelchair_base_controller::PCLDecimatorConfig &config, uint32_t level)
+void callback(pcl_decimator::PCLDecimatorConfig &config, uint32_t level)
 {
   fieldName_ = config.field_name;
   numBands_ = config.num_slices;
@@ -64,12 +64,12 @@ int main(int argc, char **argv)
 {
   ros::init(argc, argv, "pcl_decimator");
   ros::NodeHandle n;
-  cloudout_pub_ = n.advertise< pcl::PointCloud<pcl::PointXYZ> >("/camera/depth/points_passthrough", 1);
+  cloudout_pub_ = n.advertise< pcl::PointCloud<pcl::PointXYZ> >("/camera/depth/points_sliced", 1);
 
   ros::Subscriber kinect_sub = n.subscribe("/camera/depth/points", 1, pointcloudCallback);
   
-  dynamic_reconfigure::Server<wheelchair_base_controller::PCLDecimatorConfig> srv;
-  dynamic_reconfigure::Server<wheelchair_base_controller::PCLDecimatorConfig>::CallbackType f;
+  dynamic_reconfigure::Server<pcl_decimator::PCLDecimatorConfig> srv;
+  dynamic_reconfigure::Server<pcl_decimator::PCLDecimatorConfig>::CallbackType f;
   f = boost::bind(&callback, _1, _2);
   srv.setCallback(f);
 
