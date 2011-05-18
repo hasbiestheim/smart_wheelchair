@@ -35,7 +35,7 @@
   <!-- voxel: super CPU intensive, do not use? -->
   <!-- The CPU usage very much depends on the leaf_size.  It's acceptable with some throttling and at 0.01.  Without throttling or set to something ridiuclous like 0.001, the number of checks become insane. -->
   <node pkg="nodelet" type="nodelet" name="voxel_grid_nodelet" args="load pcl/VoxelGrid kinect_nodelet" output="screen">
-    <remap from="~input" to="/camera/depth/points_throttled" />
+    <remap from="~input" to="/camera/depth/points" />
     <remap from="~output" to="/camera/depth/points_voxel" />
     <rosparam>
       <!-- Don't really need any of this, and a missing field_name will cause it to automatically apply to all axes. -->
@@ -50,7 +50,7 @@
   <!-- Fake Laser - Just for fun because it's cool. -->
   <node pkg="nodelet" type="nodelet" name="kinect_laser" args="load pointcloud_to_laserscan/CloudToScan kinect_nodelet">
     <param name="output_frame_id" value="/openni_camera" />
-    <remap from="cloud" to="/camera/depth/points_throttled" />
+    <remap from="cloud" to="/camera/depth/points" />
     <remap from="scan" to="/kinect_scan" />
   </node>
 
@@ -83,7 +83,7 @@
   
   <node pkg="nodelet" type="nodelet" name="passthrough_xxz" args="load pcl/PassThrough kinect_nodelet" output="screen">
     <remap from="~input" to="/camera/depth/points_bubble_xx" />
-    <remap from="~output" to="/camera/depth/points_bubble_xxz" />
+    <remap from="~output" to="/camera/depth/points_collision" />
     <rosparam>
       filter_field_name: z
       filter_limit_min: 0.2
