@@ -5,6 +5,7 @@ import rospy
 import serial
 import struct
 from joy.msg import Joy
+from std_msgs.msg import Bool
 
 class Joy2Chair:
   def __init__(self):
@@ -12,10 +13,14 @@ class Joy2Chair:
     port_name = rospy.get_param("~port_name", "/dev/ttyUSB0")
     self.port = serial.Serial(port_name, 115200)
     rospy.Subscriber('joy', Joy, self.processJoy)
-    rospy.spin()
+    self.pub = rospy.Publisher("motors_enabled", Bool)
+    self.reflexAllow = True
     
   def checksum(self, b1, b2, b3):
     return (~(b1 + b2 + b3)+1) & 0xFF
+    
+  def processReflex(self,data):
+    self.reflexAllow = data
 
   # Go through and modify this joystick and publish a new one
   def processJoy(self,data):
@@ -29,9 +34,19 @@ class Joy2Chair:
     # Send command down to arduino
     rospy.logdebug("Sent commands are: %s %s %s %s", cmdVx, cmdWz, throttle, chk)
     self.port.write(struct.pack(">BBBB", cmdVx, cmdWz, throttle, chk))
+    
+  def loop(self):
+    while not rospy.is_shutdown():
+      byte = self.port.read(1)
+      if(!self.reflexAllow or byte == 0):
+	self.pub.publish(False)
+      else:
+	self.pub.publish(True)
+      
 
 if __name__ == '__main__':
   rospy.init_node('joy2chair')
   try:
     chairSender = Joy2Chair()
+    chairSender.loop()
   except rospy.ROSInterruptException: pass

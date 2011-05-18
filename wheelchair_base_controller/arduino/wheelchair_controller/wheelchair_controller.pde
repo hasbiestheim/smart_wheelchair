@@ -5,11 +5,14 @@
 #define THROTTLE_READ_PIN 1
 #define STEERING_READ_PIN 0
 
+#define MOTORS_ENABLED_PIN 2
 
 #define NEUTRAL_COMMAND 127
 #define MIN_1V 57
 #define MAX_4V 197
 #define DEFAULT_SPEED 255
+
+#define ESTOP_WAIT_SECONDS 2
 
 int throttle_command = NEUTRAL_COMMAND;
 int steering_command = NEUTRAL_COMMAND;
@@ -86,12 +89,38 @@ void setup() {
   analogWrite(THROTTLE_PWM_PIN, NEUTRAL_COMMAND);
   analogWrite(STEERING_PWM_PIN, NEUTRAL_COMMAND);
   analogWrite(SPEED_CONTROL_PWM_PIN, DEFAULT_SPEED);
+  pinMode(MOTORS_ENABLED_PIN, INPUT);
+  
   Serial.flush();
   time = millis();
 }
   
 void loop() {
-  if(Serial.available()) {
+  // Check estop and write status
+  byte motorsEnabled = digitalRead(MOTORS_ENABLED_PIN);
+  Serial.write(motorsEnabled);
+  
+  if(!motorsEnabled){
+    throttle_command = avoidJoyStickFault(NEUTRAL_COMMAND);
+    steering_command = avoidJoyStickFault(NEUTRAL_COMMAND);
+    speed_command = outputSaturation(DEFAULT_SPEED);
+    // Wait and do nothing until the motors are reenabled
+    while(!digitalRead(MOTORS_ENABLED_PIN)){
+      Serial.write(byte(0));
+      executeCommand();
+    }
+    unsigned long eStopTime = millis();
+    // Wait for n seconds for the center to be achieved
+    while(millis() - eStopTime < 1000*ESTOP_WAIT_SECONDS){
+      if(!digitalRead(MOTORS_ENABLED_PIN)){  // Lost the estop, time to restart the process
+        break;
+      }
+      Serial.write(byte(0));
+      executeCommand();
+    }
+    // Finally made it out of this estop cycle, time to get rid of any built up serial mess
+    Serial.flush();
+  } else if(Serial.available()) {
     byte b[4];
     for(int i = 0; i < 4; i++){
       int lastVal = Serial.read();
@@ -118,13 +147,11 @@ void loop() {
       Serial.flush();
       // Keep timing
     }
-  } else {
-    if((millis() - time) > MAX_PERIOD){
-      // We've missed the desired rate, time to stop
-      throttle_command = avoidJoyStickFault(NEUTRAL_COMMAND);
-      steering_command = avoidJoyStickFault(NEUTRAL_COMMAND);
-      speed_command = outputSaturation(DEFAULT_SPEED);
-    }
+  } else if((millis() - time) > MAX_PERIOD){
+    // We've missed the desired rate, time to stop
+    throttle_command = avoidJoyStickFault(NEUTRAL_COMMAND);
+    steering_command = avoidJoyStickFault(NEUTRAL_COMMAND);
+    speed_command = outputSaturation(DEFAULT_SPEED);
   }
   executeCommand();
 }
