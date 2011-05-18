@@ -21,6 +21,7 @@
   <depend package="pcl"/>
   <depend package="driver_base" />
   <depend package="dynamic_reconfigure" />
+  <depend package="phidgets" />
 
   <depend package="octocostmap" />
 

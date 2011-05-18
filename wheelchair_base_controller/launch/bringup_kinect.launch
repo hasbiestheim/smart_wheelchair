@@ -38,12 +38,12 @@
     <remap from="~input" to="/camera/depth/points_throttled" />
     <remap from="~output" to="/camera/depth/points_voxel" />
     <rosparam>
-      <!-- Don't need any of this, and a missing field_name will cause it to automatically apply to all axes.
-      filter_field_name: y
+      <!-- Don't really need any of this, and a missing field_name will cause it to automatically apply to all axes. -->
+      filter_field_name: ""
       filter_limit_min: -5.0
       filter_limit_max: 5.0
-      filter_limit_negative: False -->
-      leaf_size: 0.01
+      filter_limit_negative: False
+      leaf_size: 0.025
     </rosparam>
   </node>
 
@@ -54,15 +54,43 @@
     <remap from="scan" to="/kinect_scan" />
   </node>
 
-  <!-- Not used right now, just for reference. -->
-  <node pkg="nodelet" type="nodelet" name="passthrough_1" args="load pcl/PassThrough kinect_nodelet" output="screen">
+  <!-- Next two are used for reflexive collision avoidance. -->
+  <!-- Otto is 1.140m long by 0.661m wide by 0.902m tall (without Kinect) -->
+  <!-- The center of rotation is ~9.1cm behind the middle. -->
+  <node pkg="nodelet" type="nodelet" name="passthrough_x" args="load pcl/PassThrough kinect_nodelet" output="screen">
     <remap from="~input" to="/camera/depth/points" />
-    <remap from="~output" to="/camera/depth/points_passthrough_not_used" />
-    <rosparam>
-      filter_field_name: y
-      filter_limit_min: 0.99
-      filter_limit_max: 1.0
+    <remap from="~output" to="/camera/depth/points_bubble_x" />
+    <rosparam> <!-- Weird frame for the camera. -->
+      filter_field_name: x
+      filter_limit_min: -0.50
+      filter_limit_max: 0.50
       filter_limit_negative: False
+    </rosparam>
+  </node>
+  
+  <node pkg="nodelet" type="nodelet" name="passthrough_xx" args="load pcl/PassThrough kinect_nodelet" output="screen">
+    <remap from="~input" to="/camera/depth/points_bubble_x" />
+    <remap from="~output" to="/camera/depth/points_bubble_xx" />
+    <rosparam>
+      filter_field_name: x
+      filter_limit_min: 0.0
+      filter_limit_max: 3.0
+      filter_limit_negative: False
+      input_frame: /base_link
+      output_frame: /base_link
+    </rosparam>
+  </node>
+  
+  <node pkg="nodelet" type="nodelet" name="passthrough_xxz" args="load pcl/PassThrough kinect_nodelet" output="screen">
+    <remap from="~input" to="/camera/depth/points_bubble_xx" />
+    <remap from="~output" to="/camera/depth/points_bubble_xxz" />
+    <rosparam>
+      filter_field_name: z
+      filter_limit_min: 0.2
+      filter_limit_max: 2.0
+      filter_limit_negative: False
+      input_frame: /base_link
+      output_frame: /base_link
     </rosparam>
   </node>
 
