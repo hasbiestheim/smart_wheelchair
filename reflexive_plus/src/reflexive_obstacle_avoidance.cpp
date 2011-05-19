@@ -1,7 +1,6 @@
 #include <ros/ros.h>
 #include <std_msgs/String.h>
 #include <joy/Joy.h>
-#include <std_msgs/Bool.h>
 #include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/Range.h>
 #include <pcl_ros/point_cloud.h>
@@ -130,8 +129,6 @@ void pointcloudCallback(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& cloud)
 
 ros::Publisher joyout_pub;
 
-ros::Publisher collision_warn_pub;
-
 void joyCallback(const joy::Joy::ConstPtr& msg)
 {
 	/* axes[0] is Wz
@@ -141,25 +138,18 @@ void joyCallback(const joy::Joy::ConstPtr& msg)
 	joy::Joy newJoy;
 	newJoy.axes = msg->axes;
 	newJoy.buttons = msg->buttons;
-	
-	std_msgs::Bool collision_msg;
-	collision_msg.data = true;
 
 	if((!laserFrontAllow || !rangerFrontAllow || !kinectAllow) && (newJoy.axes[1] > 0.0)){
 		newJoy.axes[1] = 0.0;
-		collision_warn_pub.publish(collision_msg);
 	}
 	if(!laserRearAllow && (newJoy.axes[1] < 0.0)){
 		newJoy.axes[1] = 0.0;
-		collision_warn_pub.publish(collision_msg);
 	}
 	if(!rangerLeftAllow && (newJoy.axes[0] > 0.0)){
 		newJoy.axes[0] = 0.0;
-		collision_warn_pub.publish(collision_msg);
 	}
 	if(!rangerRightAllow && (newJoy.axes[0] < 0.0)){
 		newJoy.axes[0] = 0.0;
-		collision_warn_pub.publish(collision_msg);
 	}
 	
 	joyout_pub.publish(newJoy);
@@ -170,8 +160,6 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "new_joystick_limiter");
   ros::NodeHandle n;
   joyout_pub = n.advertise<joy::Joy>("joy_output", 1);
-  
-  collision_warn_pub = n.advertise<std_msgs::Bool>("collision_warning", 1);
 
   //ros::Subscriber laser_sub = n.subscribe("scan", 100, laserCallback);
 

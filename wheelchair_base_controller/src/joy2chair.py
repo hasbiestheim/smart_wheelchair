@@ -13,7 +13,7 @@ class Joy2Chair:
     port_name = rospy.get_param("~port_name", "/dev/ttyUSB0")
     self.port = serial.Serial(port_name, 115200)
     rospy.Subscriber('joy', Joy, self.processJoy)
-    rospy.Subscriber('reflexive_halt', Joy, self.processJoy)
+    rospy.Subscriber('collision_warning', Joy, self.processJoy)
     self.pub = rospy.Publisher("motors_enabled", Bool)
     self.reflexAllow = True
     
@@ -21,7 +21,7 @@ class Joy2Chair:
     return (~(b1 + b2 + b3)+1) & 0xFF
     
   def processReflex(self,data):
-    self.reflexAllow = data
+    self.reflexAllow = True#data
 
   # Go through and modify this joystick and publish a new one
   def processJoy(self,data):
