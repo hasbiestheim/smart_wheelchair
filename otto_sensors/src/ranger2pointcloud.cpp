@@ -3,6 +3,8 @@
 #include <pcl_ros/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/io/pcd_io.h>
+#include <dynamic_reconfigure/server.h>
+#include <otto_sensors/Range2PointConfig.h>
 #include <math.h>
 
 // PARAMETERS
@@ -56,14 +58,25 @@ void rangeCallback(const sensor_msgs::Range::ConstPtr& msg)
 	}
 }
 
+void callback(otto_sensors::Range2PointConfig &config, uint32_t level)
+{
+  angular_slices_ = config.angular_slices;
+  axial_slices_ = config.radial_slices;
+}
+
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "ranger2pointcloud");
   ros::NodeHandle n;
   pcl_pub = n.advertise<pcl::PointCloud<pcl::PointXYZ> >("ranger_pointcloud", 1);
   
-  angular_slices_ = 31;
-  axial_slices_ = 30;
+  dynamic_reconfigure::Server<otto_sensors::Range2PointConfig> srv;
+  dynamic_reconfigure::Server<otto_sensors::Range2PointConfig>::CallbackType f;
+  f = boost::bind(&callback, _1, _2);
+  srv.setCallback(f);
+  
+  angular_slices_ = 4;
+  axial_slices_ = 3;
 
   ros::Subscriber ranger_sub = n.subscribe("sonars", 100, rangeCallback);
 
