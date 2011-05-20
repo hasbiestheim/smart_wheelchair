@@ -21,7 +21,7 @@ class Joy2Chair:
     return (~(b1 + b2 + b3)+1) & 0xFF
     
   def processReflex(self,data):
-    self.reflexAllow = True#data
+    self.reflexAllow = data
 
   # Go through and modify this joystick and publish a new one
   def processJoy(self,data):
@@ -39,7 +39,7 @@ class Joy2Chair:
   def loop(self):
     while not rospy.is_shutdown():
       byte = self.port.read(1)
-      if(!self.reflexAllow or byte == 0):
+      if((not self.reflexAllow) or byte == 0):
 	self.pub.publish(False)
       else:
 	self.pub.publish(True)
