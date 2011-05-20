@@ -38,11 +38,11 @@ class Joy2Chair:
     
   def loop(self):
     while not rospy.is_shutdown():
-      byte = self.port.read(1)
-      if((not self.reflexAllow) or byte == 0):
-	self.pub.publish(False)
-      else:
+      readLine = self.port.readline()
+      if(readLine[0] ==  "1"):
 	self.pub.publish(True)
+      else:
+	self.pub.publish(False)
       
 
 if __name__ == '__main__':

@@ -17,7 +17,6 @@
   <depend package="sensor_msgs"/>
   <depend package="tf"/>
   <depend package="phidgets" />
-  <depend package="octocostmap" />
   
   <rosdep name="python-serial" />
 
