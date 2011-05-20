@@ -5,7 +5,8 @@
 #define THROTTLE_READ_PIN 1
 #define STEERING_READ_PIN 0
 
-#define MOTORS_ENABLED_PIN 2
+#define MOTORS_ENABLED_READ 3
+#define MOTORS_ENABLED_WRITE 2
 
 #define NEUTRAL_COMMAND 127
 #define MIN_1V 57
@@ -89,34 +90,56 @@ void setup() {
   analogWrite(THROTTLE_PWM_PIN, NEUTRAL_COMMAND);
   analogWrite(STEERING_PWM_PIN, NEUTRAL_COMMAND);
   analogWrite(SPEED_CONTROL_PWM_PIN, DEFAULT_SPEED);
-  pinMode(MOTORS_ENABLED_PIN, INPUT);
+  pinMode(MOTORS_ENABLED_READ, INPUT);
+  pinMode(MOTORS_ENABLED_WRITE, OUTPUT);
   
   Serial.flush();
   time = millis();
 }
-  
+
+// This loop runs very fast, like 3000 Hz, so limit it down on the prints
+// countMulti 100 produces 27 to 30Hz outputs, much easier.
+int lCounter = 0;
+int countMult = 100;
+
 void loop() {
   // Check estop and write status
-  byte motorsEnabled = digitalRead(MOTORS_ENABLED_PIN);
-  Serial.write(motorsEnabled);
+  byte motorsEnabled = digitalRead(MOTORS_ENABLED_READ);
+  digitalWrite(MOTORS_ENABLED_WRITE, motorsEnabled);
+  if(lCounter % countMult == 0){
+    if(motorsEnabled == 0){
+      Serial.print("0\n");
+    } else {
+      Serial.print("1\n");
+    }
+  }
   
-  if(!motorsEnabled){
+  if(motorsEnabled == 0){
     throttle_command = avoidJoyStickFault(NEUTRAL_COMMAND);
     steering_command = avoidJoyStickFault(NEUTRAL_COMMAND);
     speed_command = outputSaturation(DEFAULT_SPEED);
     // Wait and do nothing until the motors are reenabled
-    while(!digitalRead(MOTORS_ENABLED_PIN)){
-      Serial.write(byte(0));
+    while(!digitalRead(MOTORS_ENABLED_READ)){
+      digitalWrite(MOTORS_ENABLED_WRITE, 0);
+      if(lCounter % countMult == 0){
+        Serial.print("0\n");
+      }
       executeCommand();
+      lCounter++;
     }
     unsigned long eStopTime = millis();
     // Wait for n seconds for the center to be achieved
     while(millis() - eStopTime < 1000*ESTOP_WAIT_SECONDS){
-      if(!digitalRead(MOTORS_ENABLED_PIN)){  // Lost the estop, time to restart the process
+      if(!digitalRead(MOTORS_ENABLED_READ)){  // Lost the estop, time to restart the process
+        digitalWrite(MOTORS_ENABLED_WRITE, 0);
         break;
       }
-      Serial.write(byte(0));
+      digitalWrite(MOTORS_ENABLED_WRITE, 1);
+      if(lCounter % countMult == 0){
+        Serial.print("0\n");
+      }
       executeCommand();
+      lCounter++;
     }
     // Finally made it out of this estop cycle, time to get rid of any built up serial mess
     Serial.flush();
@@ -154,4 +177,5 @@ void loop() {
     speed_command = outputSaturation(DEFAULT_SPEED);
   }
   executeCommand();
+  lCounter++;
 }
