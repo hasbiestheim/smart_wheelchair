@@ -10,9 +10,9 @@ import csv
 
 class JoyCalib:
     def __init__(self):
-        self.joy_pub = rospy.Publisher('joy', Joy)
-        rospy.Subscriber('/phidgets/encoder/102232', encoder_params, self.processLEnc)
-	rospy.Subscriber('/phidgets/encoder/102172', encoder_params, self.processREnc)
+        self.joy_pub = rospy.Publisher('joy_cal', Joy)
+        rospy.Subscriber('/phidgets/encoder/102172', encoder_params, self.processLEnc)
+	rospy.Subscriber('/phidgets/encoder/102232', encoder_params, self.processREnc)
 	self.waitTime = 10.0 # Time to wait in seconds after each command
         
         self.lenc = 0
