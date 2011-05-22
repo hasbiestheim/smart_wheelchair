@@ -1,6 +1,5 @@
 #define THROTTLE_PWM_PIN 9
 #define STEERING_PWM_PIN 10
-#define SPEED_CONTROL_PWM_PIN 11
 
 #define THROTTLE_READ_PIN 1
 #define STEERING_READ_PIN 0
@@ -11,13 +10,11 @@
 #define NEUTRAL_COMMAND 127
 #define MIN_1V 57
 #define MAX_4V 197
-#define DEFAULT_SPEED 255
 
 #define ESTOP_WAIT_SECONDS 2
 
 int throttle_command = NEUTRAL_COMMAND;
 int steering_command = NEUTRAL_COMMAND;
-int speed_command = DEFAULT_SPEED;
 
 // PID gains
 const float ktp = 0.1;
@@ -51,10 +48,6 @@ void executeCommand() {
   cmd = steering_command+pTerm+iTerm;
   si = si + 20*(outputSaturation(cmd) - cmd); // Prevent integral windup
   analogWrite(STEERING_PWM_PIN, outputSaturation(cmd));
-  
-  // Always send max speed control.  I am not sure of their implementation.
-  analogWrite(SPEED_CONTROL_PWM_PIN, DEFAULT_SPEED);
-  
 }
 
 int avoidJoyStickFault(int cmd){
@@ -84,14 +77,17 @@ byte checkSum(byte b1, byte b2, byte b3){
 }
 
 void setup() {
+  // Change the analog reference to avoid possible issues with USB supplies
+  analogReference(EXTERNAL);
+  
   Serial.begin(115200);
   
   // Initialization
   analogWrite(THROTTLE_PWM_PIN, NEUTRAL_COMMAND);
   analogWrite(STEERING_PWM_PIN, NEUTRAL_COMMAND);
-  analogWrite(SPEED_CONTROL_PWM_PIN, DEFAULT_SPEED);
   pinMode(MOTORS_ENABLED_READ, INPUT);
   pinMode(MOTORS_ENABLED_WRITE, OUTPUT);
+  
   
   Serial.flush();
   time = millis();
@@ -105,7 +101,7 @@ int countMult = 100;
 void loop() {
   // Check estop and write status
   byte motorsEnabled = digitalRead(MOTORS_ENABLED_READ);
-  digitalWrite(MOTORS_ENABLED_WRITE, motorsEnabled);
+  digitalWrite(MOTORS_ENABLED_WRITE, !motorsEnabled); // Inverted input
   if(lCounter % countMult == 0){
     if(motorsEnabled == 0){
       Serial.print("0\n");
@@ -117,10 +113,9 @@ void loop() {
   if(motorsEnabled == 0){
     throttle_command = avoidJoyStickFault(NEUTRAL_COMMAND);
     steering_command = avoidJoyStickFault(NEUTRAL_COMMAND);
-    speed_command = outputSaturation(DEFAULT_SPEED);
     // Wait and do nothing until the motors are reenabled
     while(!digitalRead(MOTORS_ENABLED_READ)){
-      digitalWrite(MOTORS_ENABLED_WRITE, 0);
+      digitalWrite(MOTORS_ENABLED_WRITE, 1); // Remember, inverted input, so this 1 is OFF
       if(lCounter % countMult == 0){
         Serial.print("0\n");
       }
@@ -131,10 +126,10 @@ void loop() {
     // Wait for n seconds for the center to be achieved
     while(millis() - eStopTime < 1000*ESTOP_WAIT_SECONDS){
       if(!digitalRead(MOTORS_ENABLED_READ)){  // Lost the estop, time to restart the process
-        digitalWrite(MOTORS_ENABLED_WRITE, 0);
+        digitalWrite(MOTORS_ENABLED_WRITE, 1); // Remember, inverted input, so this 1 is OFF
         break;
       }
-      digitalWrite(MOTORS_ENABLED_WRITE, 1);
+      digitalWrite(MOTORS_ENABLED_WRITE, 0); // Remember, inverted input, so this 0 is ON
       if(lCounter % countMult == 0){
         Serial.print("0\n");
       }
@@ -156,12 +151,11 @@ void loop() {
     // byte format is uint8_t throttle, uint8_t steering, utint8_t speed, uint8_t check
     byte tTemp = b[0];
     byte sTemp = b[1];
-    byte spTemp = b[2];
+    byte spTemp = b[2];  // No longer used
     byte check = b[3];
     if(check == checkSum(tTemp, sTemp, spTemp)){
       throttle_command = avoidJoyStickFault(tTemp);
       steering_command = avoidJoyStickFault(sTemp);
-      speed_command = outputSaturation(spTemp);
       
       // Store the current time
       time = millis();
@@ -174,7 +168,6 @@ void loop() {
     // We've missed the desired rate, time to stop
     throttle_command = avoidJoyStickFault(NEUTRAL_COMMAND);
     steering_command = avoidJoyStickFault(NEUTRAL_COMMAND);
-    speed_command = outputSaturation(DEFAULT_SPEED);
   }
   executeCommand();
   lCounter++;
