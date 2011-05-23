@@ -18,9 +18,9 @@ int steering_command = NEUTRAL_COMMAND;
 
 // PID gains
 const float ktp = 0.1;
-const float kti = 0.01;
+const float kti = 0.005;
 const float ksp = 0.1;
-const float ksi = 0.01;
+const float ksi = 0.005;
 
 // PID state variables
 int ti = 0.0;
@@ -32,7 +32,7 @@ unsigned long time;
 
 void executeCommand() {
   // Run the throttle PID iteration
-  int err = throttle_command-(analogRead(THROTTLE_READ_PIN))/4; // Error term, analog offset is to get better neutral position
+  int err = throttle_command-(analogRead(THROTTLE_READ_PIN)-7)/4; // Error term, analog offset is to get better neutral position
   int pTerm = (int) (ktp * err);
   ti = ti + err;
   int iTerm = (int) (kti * ti);
@@ -40,8 +40,15 @@ void executeCommand() {
   ti = ti + 20*(outputSaturation(cmd) - cmd); // Prevent integral windup
   analogWrite(THROTTLE_PWM_PIN, outputSaturation(cmd));
   
+  /*Serial.print(throttle_command);
+  Serial.print(" ");
+  Serial.print(outputSaturation(cmd));
+  Serial.print(" " );
+  Serial.print(analogRead(THROTTLE_READ_PIN)/4);
+  Serial.print("\n");*/
+    
   // Run the steering PID iteration
-  err = steering_command-(analogRead(STEERING_READ_PIN))/4; // Error term, analog offset is to get better neutral position
+  err = steering_command-(analogRead(STEERING_READ_PIN)-6)/4; // Error term, analog offset is to get better neutral position
   pTerm = (int) (ksp * err);
   si = si + err;
   iTerm = (int) (ksi * si);
