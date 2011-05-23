@@ -1,0 +1,6 @@
+<launch>
+  <node pkg="tf" type="static_transform_publisher" name="neato_static_tf_pub" args="0.2667 0 0.1524 3.14159265358979 0 0 base_link neato_laser 100" />
+
+  <node pkg="tf" type="static_transform_publisher" name="hokuyo_static_tf_pub" args="0.0317 0 -0.0952 3.14159265358979 0 3.14159265358979 neato_laser hokuyo_laser 100" />
+
+</launch>

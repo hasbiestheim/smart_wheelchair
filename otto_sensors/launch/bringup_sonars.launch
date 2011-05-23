@@ -2,17 +2,6 @@
 	<node pkg="otto_sensors" type="sonarReader.py" name="sonarReader" output="screen">
 		<param name="port_name" value="/dev/sensors/ftdi_A900ceGt" />
 	</node>
-
-	<node pkg="tf" type="static_transform_publisher" name="frontLeftSonarTF" args="0.508 0.2286 0.4318 0 0 0 base_link frontLeftSonar 100" />
-
-	<node pkg="tf" type="static_transform_publisher" name="diagLeftSonarTF" args="0.4953 0.2286 0.4064 -0.5235983 0 0 base_link diagLeftSonar 100" />
-
-	<node pkg="tf" type="static_transform_publisher" name="sideLeftSonarTF" args="0.4572 0.2286 0.4064 1.57079633 0 0 base_link sideLeftSonar 100" />
-
-	<node pkg="tf" type="static_transform_publisher" name="frontRightSonarTF" args="0.508 -0.2286 0.4318 0 0 0 base_link frontRightSonar 100" />
-
-	<node pkg="tf" type="static_transform_publisher" name="diagRightSonarTF" args="0.4953 -0.2286 0.4064 0.5235983 0 0 base_link diagRightSonar 100" />
-
-	<node pkg="tf" type="static_transform_publisher" name="sideRightSonarTF" args="0.4572 -0.2286 0.4064 -1.57079633 0 0 base_link sideRightSonar 100" />
-
+	
+	<include file="$(find otto_sensors)/launch/tf_sonars.launch" />
 </launch>

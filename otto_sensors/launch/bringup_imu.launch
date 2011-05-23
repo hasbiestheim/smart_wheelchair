@@ -1,8 +1,7 @@
 <launch>
   <node pkg="otto_sensors" type="imu_quatcaster.py" name="imu_broadcaster" >
     <param name="port_name" value="/dev/sensors/ftdi_A700eHSG" />
-    
-    <node pkg="tf" type="static_transform_publisher" name="imuStaticTF" args="0 0 0 0 0 0 base_link imu 100" />
-
   </node>
+  
+  <include file="$(find otto_sensors)/launch/tf_imu.launch" />
 </launch>

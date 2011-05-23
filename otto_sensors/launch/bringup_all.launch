@@ -1,0 +1,9 @@
+<launch>
+  <include file="$(find otto_sensors)/launch/bringup_imu.launch" />
+  
+  <include file="$(find otto_sensors)/launch/bringup_lasers.launch" />
+  
+  <include file="$(find otto_sensors)/launch/bringup_sonars.launch" />
+  
+  <include file="$(find otto_sensors)/launch/bringup_kinect.launch" />
+</launch>

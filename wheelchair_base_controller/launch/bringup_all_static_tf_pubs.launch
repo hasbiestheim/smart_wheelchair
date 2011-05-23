@@ -1,0 +1,11 @@
+<launch>
+  
+  <include file="$(find otto_sensors)/launch/tf_kinect.launch" />
+  
+  <include file="$(find otto_sensors)/launch/tf_lasers.launch" />
+  
+  <include file="$(find otto_sensors)/launch/tf_sonars.launch" />
+  
+  <include file="$(find otto_sensors)/launch/tf_imu.launch" />
+  
+</launch>
