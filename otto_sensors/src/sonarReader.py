@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import roslib; roslib.load_manifest('sonar_joy')
+import roslib; roslib.load_manifest('otto_sensors')
 import rospy
 import serial
 from sensor_msgs.msg import Range
