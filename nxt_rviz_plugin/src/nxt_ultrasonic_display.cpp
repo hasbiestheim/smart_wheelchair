@@ -46,7 +46,7 @@ NXTUltrasonicDisplay::~NXTUltrasonicDisplay()
 
 void NXTUltrasonicDisplay::clear()
 {
-
+  setBuffer( cones_.size() );
   messages_received_ = 0;
   setStatus(rviz::status_levels::Warn, "Topic", "No messages received");
 }
