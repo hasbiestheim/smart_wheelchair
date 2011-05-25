@@ -108,7 +108,7 @@ int countMult = 100;
 void loop() {
   // Check estop and write status
   byte motorsEnabled = digitalRead(MOTORS_ENABLED_READ);
-  digitalWrite(MOTORS_ENABLED_WRITE, !motorsEnabled); // Inverted input
+  digitalWrite(MOTORS_ENABLED_WRITE, motorsEnabled);
   if(lCounter % countMult == 0){
     if(motorsEnabled == 0){
       Serial.print("0\n");
@@ -122,7 +122,7 @@ void loop() {
     steering_command = avoidJoyStickFault(NEUTRAL_COMMAND);
     // Wait and do nothing until the motors are reenabled
     while(!digitalRead(MOTORS_ENABLED_READ)){
-      digitalWrite(MOTORS_ENABLED_WRITE, 1); // Remember, inverted input, so this 1 is OFF
+      digitalWrite(MOTORS_ENABLED_WRITE, 0);
       if(lCounter % countMult == 0){
         Serial.print("0\n");
       }
@@ -133,10 +133,10 @@ void loop() {
     // Wait for n seconds for the center to be achieved
     while(millis() - eStopTime < 1000*ESTOP_WAIT_SECONDS){
       if(!digitalRead(MOTORS_ENABLED_READ)){  // Lost the estop, time to restart the process
-        digitalWrite(MOTORS_ENABLED_WRITE, 1); // Remember, inverted input, so this 1 is OFF
+        digitalWrite(MOTORS_ENABLED_WRITE, 0);
         break;
       }
-      digitalWrite(MOTORS_ENABLED_WRITE, 0); // Remember, inverted input, so this 0 is ON
+      digitalWrite(MOTORS_ENABLED_WRITE, 1);
       if(lCounter % countMult == 0){
         Serial.print("0\n");
       }
