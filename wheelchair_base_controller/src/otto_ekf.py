@@ -68,7 +68,7 @@ class EKF:
     rospy.spin()
     
   def update_enabled(self,msg):
-    self.motors_enabled = msg
+    self.motors_enabled = msg.data
     
   def record_command(self, msg):
     self.cmd = msg
