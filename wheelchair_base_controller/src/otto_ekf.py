@@ -136,8 +136,6 @@ class EKF:
     
     # Assume that our angular velocity is the magnitude of the vector and in the direction of y
     wm = -sign(msg.angular_velocity.x)*sqrt(pow(msg.angular_velocity.x,2)+pow(msg.angular_velocity.z,2))
-    if(abs(wm) > 0.02):
-      wm = wm - 0.01
     
     # Assume our acceleration is the magnitude of the vector (excluding x!!!) minus gravity
     
@@ -147,7 +145,7 @@ class EKF:
     
     
     
-    am = -(msg.linear_acceleration.z+1.67)
+    am = -(msg.linear_acceleration.z+0.25)
     '''if(abs(self.cmd.linear.x) < 0.01 and abs(self.x[3]) < .1):
       zp[0,1] = 0.0
       am = 0.0'''
