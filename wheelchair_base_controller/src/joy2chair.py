@@ -34,7 +34,8 @@ class Joy2Chair:
     joyW = data.axes[0]
     if(abs(joyW) > 0.9): # Keep the joystick data in the linear range of the wheelchair
       joyW = copysign(0.9,joyW)
-    cmdWz = int(127 - data.axes[0]*70.0) & 0xFF
+    cmdWz = int(127 - joyW*70.0) & 0xFF
+
     #throttle = THROTTLE NO LONGER FUNCTIONS, DO NOT USE
     throttle = 255 & 0xFF #int(1+throttle * 254) 
     chk = self.checksum(cmdVx,cmdWz,throttle)
