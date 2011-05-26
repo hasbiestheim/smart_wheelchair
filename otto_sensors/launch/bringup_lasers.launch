@@ -2,15 +2,18 @@
 	<node pkg="xv_11_laser_driver" type="neato_laser_publisher" name="neatoReader" output="screen">
 		<param name="port" value="/dev/sensors/ftdi_A600e1pa" />
 		<param name="frame_id" value="neato_laser" />
-		<remap from="scan" to="neato_scan" />
+		<remap from="scan" to="neato/scan" />
 	</node>
 
 	<node pkg="hokuyo_node" type="hokuyo_node" name="hokuyoReader" output="screen">
+		<!--param name="port" value="/dev/sensors/hokuyo_H1000492"/-->
 		<param name="frame_id" value="hokuyo_laser" />
 		<param name="min_ang" value="-2.0862" />
 		<param name="max_ang" value="2.0923" />
-		<remap from="scan" to="hokuyo_scan" />
+		<remap from="scan" to="hokuyo/scan" />
 	</node>
+	
+	<include file="$(find otto_sensors)/launch/filters_lasers.launch" />
 	
 	<include file="$(find otto_sensors)/launch/tf_lasers.launch" />
 	

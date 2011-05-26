@@ -6,7 +6,3 @@ scan_filter_chain:
     max_angle: 175
     neighbors: 3
     window: 1
-- name: radius_remover
-  type: LaserScanFootprintFilter
-  params:
-    inscribed_radius: 0.47
