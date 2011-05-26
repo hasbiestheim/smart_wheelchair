@@ -33,26 +33,19 @@ class EKF:
     # Kalman process noise
     qxy = float(rospy.get_param('~Process_Noise/qXY', '1e-8'))
     qth = float(rospy.get_param('~Process_Noise/qW', '1e-8'))
-    qv = float(rospy.get_param('~Process_Noise/qV', '0.001'))
-    qw = float(rospy.get_param('~Process_Noise/qWp', '0.10'))
-    qa = float(rospy.get_param('~Process_Noise/qA', '0.10'))
+    qv = float(rospy.get_param('~Process_Noise/qV', '1'))
+    qw = float(rospy.get_param('~Process_Noise/qWp', '5'))
+    qa = float(rospy.get_param('~Process_Noise/qA', '1'))
     q = array((qxy, qxy, qth, qv, qw, qa))
     self.Q = diagflat(q)
     
     # Sensor variances
-    self.qgyro = float(rospy.get_param('~Measurement_Noise/gZvar', '0.1'))
-    self.qaccel = float(rospy.get_param('~Measurement_Noise/aXVar', '0.1'))
+    self.qgyro = float(rospy.get_param('~Measurement_Noise/gZvar', '0.001'))
+    self.qaccel = float(rospy.get_param('~Measurement_Noise/aXVar', '0.01'))
+    self.qcontrols = 1000.0;
     
     # Model constants
     self.dt = float(rospy.get_param('~dt', '0.02'))
-    
-    # Linear acceleration and braking
-    self.ax = float(rospy.get_param('~invacareAccel', '1.0'))
-    # try [.9 1.0 1.1 1.2]
-    self.bx = float(rospy.get_param('~invacareBrake', '2.0'))
-    # try [2.0 2.1 2.2]
-    
-    self.gz = 0.12
 
     self.initCommon()
 
@@ -89,18 +82,18 @@ class EKF:
     w = self.x[4]
   
     # Control prediction
-    a = self.returnAccelFromV(self.cmd.linear.x, v, self.ax, self.bx, self.dt)
+    a = self.x[5] #self.returnAccelFromV(self.cmd.linear.x, v, self.ax, self.bx, self.dt)
     #alpha = self.returnAccelFromV(self.cmd.angular.z, w, self.aphz, self.bphz, self.dt)
     
-    if(abs(self.cmd.linear.x) < 0.01 and abs(v < 0.05)):
-      v = 0.0
+    '''if(abs(self.cmd.linear.x) < 0.01 and abs(v < 0.05)):
+      v = 0.0'''
     
     # Actual state predictions
     self.x[0] = x + v*self.dt*cos(th)
     self.x[1] = y + v*self.dt*sin(th)
     self.x[2] = th + w*self.dt
     self.x[3] = v + a*self.dt
-    self.x[4] = w# + alpha*self.dt
+    self.x[4] = w
     self.x[5] = a
     
     # Covariance prediction
@@ -124,7 +117,7 @@ class EKF:
   def modelJacobian(self):
     th = self.x[2]
     v = self.x[3]
-    a = self.x[4]
+    a = self.x[5]
     dt = self.dt
     
     self.A = eye(6)
@@ -139,8 +132,12 @@ class EKF:
     self.sensorJacobian()
     zp = self.sensor_prediction()
     
+    vm = self.cmd.linear.x
+    
     # Assume that our angular velocity is the magnitude of the vector and in the direction of y
-    wm = sign(msg.angular_velocity.y)*sqrt(pow(msg.angular_velocity.x,2)+pow(msg.angular_velocity.y,2)+pow(msg.angular_velocity.z,2))
+    wm = -sign(msg.angular_velocity.x)*sqrt(pow(msg.angular_velocity.x,2)+pow(msg.angular_velocity.z,2))
+    if(abs(wm) > 0.02):
+      wm = wm - 0.01
     
     # Assume our acceleration is the magnitude of the vector (excluding x!!!) minus gravity
     
@@ -150,14 +147,14 @@ class EKF:
     
     
     
-    am = -msg.linear_acceleration.z-self.gz
-    if(abs(self.cmd.linear.x) < 0.01 and abs(self.x[3]) < .1):
+    am = -(msg.linear_acceleration.z+1.67)
+    '''if(abs(self.cmd.linear.x) < 0.01 and abs(self.x[3]) < .1):
       zp[0,1] = 0.0
-      am = 0.0
+      am = 0.0'''
     
-    z = array([wm, am]).T
+    z = array([vm, wm, am]).T
     
-    R = diagflat(array([self.qgyro, self.qaccel]))
+    R = diagflat(array([self.qcontrols, self.qgyro, self.qaccel]))
     y = z - zp
     S = dot(dot(self.H,self.P),self.H.T) + R
     K = dot(dot(self.P,self.H.T),linalg.pinv(S))
@@ -166,9 +163,10 @@ class EKF:
       
     
   def sensor_prediction(self):
+    v = self.x[3]
     w = self.x[4]
     a = self.x[5]
-    z = array([w, a])
+    z = array([v, w, a])
     return z.T
     
   @staticmethod
@@ -176,9 +174,10 @@ class EKF:
     return c0 + c1 * abs(meas) + c2 * pow(meas,2)
     
   def sensorJacobian(self):
-    self.H = zeros((2,6))
-    self.H[0,4] = 1.0
-    self.H[1,5] = 1.0
+    self.H = zeros((3,6))
+    self.H[0,3] = 1.0
+    self.H[1,4] = 1.0
+    self.H[2,5] = 1.0
     
   def getState(self):
     return self.x
