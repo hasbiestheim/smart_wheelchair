@@ -6,6 +6,7 @@ import rospy
 from joy.msg import Joy
 from geometry_msgs.msg import Twist
 from numpy import *
+from math import copysign
 import scipy.interpolate
 
 class Joy2Twist:
@@ -39,6 +40,12 @@ class Joy2Twist:
   def processJoy(self,data):
     cmdVx = data.axes[1]
     cmdWz = data.axes[0]
+    
+    if(abs(cmdVx) > 0.9): # Keep the joystick data in the linear range of the wheelchair
+      cmdVx = copysign(0.9,cmdVx)
+      
+    if(abs(cmdWz) > 0.9): # Keep the joystick data in the linear range of the wheelchair
+      cmdWz = copysign(0.9,cmdWz)
     
     v_est = 0.0
     w_est = 0.0
