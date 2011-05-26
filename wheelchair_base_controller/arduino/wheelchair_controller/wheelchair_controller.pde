@@ -17,10 +17,10 @@ int throttle_command = NEUTRAL_COMMAND;
 int steering_command = NEUTRAL_COMMAND;
 
 // PID gains
-const float ktp = 0.1;
-const float kti = 0.005;
-const float ksp = 0.1;
-const float ksi = 0.005;
+const float ktp = 0.3;
+const float kti = 0.04;
+const float ksp = 0.6;
+const float ksi = 0.04;
 
 // PID state variables
 int ti = 0.0;
