@@ -27,6 +27,9 @@ from sensor_msgs.msg import Imu
 from geometry_msgs.msg import Twist
 from geometry_msgs.msg import PoseWithCovariance
 from geometry_msgs.msg import Quaternion
+from geometry_msgs.msg import Vector3Stamped
+from std_msgs.msg import Bool
+import tf.transformations as tf_math
 
 class EKF:    
   def __init__(self, gX):
@@ -54,12 +57,18 @@ class EKF:
     self.x = zeros((6,1)) # Kalman state [x; y; th; v; w; ax]
     self.P = eye(6) # Covariance matrix
     self.cmd = Twist()
+    self.motors_enabled = False
+    self.listener = tf.TransformListener() 
     
     rospy.Subscriber('cmd_vel', Twist, self.record_command)
     rospy.Subscriber('imu', Imu, self.update_filter)
+    rospy.Subscriber('motors_enabled', Bool, self.update_enabled)
     self.odom_pub = rospy.Publisher('odom', Odometry)
     self.tf_br = tf.TransformBroadcaster()
     rospy.spin()
+    
+  def update_enabled(self,msg):
+    self.motors_enabled = msg
     
   def record_command(self, msg):
     self.cmd = msg
@@ -132,23 +141,33 @@ class EKF:
     self.sensorJacobian()
     zp = self.sensor_prediction()
     
-    vm = self.cmd.linear.x
-    
-    # Assume that our angular velocity is the magnitude of the vector and in the direction of y
-    wm = -sign(msg.angular_velocity.x)*sqrt(pow(msg.angular_velocity.x,2)+pow(msg.angular_velocity.z,2))
-    
-    # Assume our acceleration is the magnitude of the vector (excluding x!!!) minus gravity
-    
-    '''amag = pow(msg.linear_acceleration.y,2-self.gy)+pow(msg.linear_acceleration.z,2-self.gz)
-    am = -sign(msg.linear_acceleration.z)*sqrt(amag) # Watch out for ramps, etc
-    print am'''
-    
-    
-    
-    am = -(msg.linear_acceleration.z+0.25)
-    '''if(abs(self.cmd.linear.x) < 0.01 and abs(self.x[3]) < .1):
-      zp[0,1] = 0.0
-      am = 0.0'''
+    if(self.motors_enabled): # The wheelchair can actually respond to commands, so take them as fact
+      vm = self.cmd.linear.x
+    else:
+      vm = 0.0 # Assume the chair is now stopping since the motors are disabled
+      
+    try:
+      # Transform angular velocity into /base_link
+      vw = Vector3Stamped()
+      vw.header.frame_id = msg.header.frame_id
+      vw.vector.x = msg.angular_velocity.x
+      vw.vector.y = msg.angular_velocity.y
+      vw.vector.z = msg.angular_velocity.z
+      vw = self.listener.transformVector3("/base_link", vw)
+      wm = vw.vector.z
+
+      # Transform accelerometers into /base_link
+      va = Vector3Stamped()
+      va.header.frame_id = msg.header.frame_id
+      va.vector.x = msg.linear_acceleration.x
+      va.vector.y = msg.linear_acceleration.y
+      va.vector.z = msg.linear_acceleration.z
+      va = self.listener.transformVector3("/base_link", va)
+      am = va.vector.x
+    except:
+      wm = 0.0
+      am = 0.0
+      rospy.logwarn("No transform from IMU to base_link, assuming 0s for IMU readings.")
     
     z = array([vm, wm, am]).T
     
