@@ -6,6 +6,7 @@ import serial
 import struct
 from joy.msg import Joy
 from std_msgs.msg import Bool
+from math import copysign
 
 class Joy2Chair:
   def __init__(self):
@@ -25,11 +26,16 @@ class Joy2Chair:
 
   # Go through and modify this joystick and publish a new one
   def processJoy(self,data):
-    cmdVx = int(127 + data.axes[1]*70.0) & 0xFF
-    #print cmdVx
+    joyV = data.axes[1]
+    if(abs(joyV) > 0.9): # Keep the joystick data in the linear range of the wheelchair
+      joyV = copysign(0.9,joyV)
+    cmdVx = int(127 + joyV*70.0) & 0xFF
+    
+    joyW = data.axes[0]
+    if(abs(joyW) > 0.9): # Keep the joystick data in the linear range of the wheelchair
+      joyW = copysign(0.9,joyW)
     cmdWz = int(127 - data.axes[0]*70.0) & 0xFF
-    # -1 is fastest, +1 is slowest, pushing causes axis to become most negative
-    #throttle = .5-.45*data.axes[2] #wheelchair throttle does not accept negative values
+    #throttle = THROTTLE NO LONGER FUNCTIONS, DO NOT USE
     throttle = 255 & 0xFF #int(1+throttle * 254) 
     chk = self.checksum(cmdVx,cmdWz,throttle)
     # Send command down to arduino
