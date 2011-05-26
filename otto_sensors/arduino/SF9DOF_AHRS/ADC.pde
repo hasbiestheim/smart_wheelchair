@@ -28,9 +28,11 @@ void Read_adc_raw(void)
 
 float read_adc(int select)
 {
-  int value = AN[select]-AN_OFFSET[select];
-  if(value < 2 && value > -2){
-    return 0;
+  if(select < 3){
+    int value = AN[select]-AN_OFFSET[select];
+    if(value < 2 && value > -2){
+      return 0;
+    }
   }
   if (SENSOR_SIGN[select]<0)
     return(AN_OFFSET[select]-AN[select]);

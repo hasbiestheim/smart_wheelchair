@@ -164,21 +164,21 @@ void setup()
     }
     
   for(int y=0; y<6; y++)
-    AN_OFFSET[y] = AN_OFFSET[y]/32;*/
-  
+    AN_OFFSET[y] = AN_OFFSET[y]/32;
+    
+  Serial.println("Offset:");
+  for(int y=0; y<6; y++)
+    Serial.println(AN_OFFSET[y]);*/
+     
   // Gyro biases too high pushes gyro reading negative, too low pushes it higher
   // Gyro biases  
   AN_OFFSET[0] = 379;
   AN_OFFSET[1] = 383;
   AN_OFFSET[2] = 374;
   // Accelerometer biases
-  AN_OFFSET[3] = 6;
-  AN_OFFSET[4] = 4;  
-  AN_OFFSET[5] = 10;//GRAVITY*SENSOR_SIGN[5];
-  
-  //Serial.println("Offset:");
-  //for(int y=0; y<6; y++)
-    //Serial.println(AN_OFFSET[y]);
+  AN_OFFSET[3] = 4;
+  AN_OFFSET[4] = 0;  
+  AN_OFFSET[5] = -37;//GRAVITY*SENSOR_SIGN[5];
   
   ///delay(2000);
   digitalWrite(STATUS_LED,HIGH);
