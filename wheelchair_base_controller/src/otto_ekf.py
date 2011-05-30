@@ -45,7 +45,7 @@ class EKF:
     # Sensor variances
     self.qgyro = float(rospy.get_param('~Measurement_Noise/gZvar', '0.001'))
     self.qaccel = float(rospy.get_param('~Measurement_Noise/aXVar', '0.01'))
-    self.qcontrols = 1000.0;
+    self.qcontrols = 100.0;
     
     # Model constants
     self.dt = float(rospy.get_param('~dt', '0.02'))
@@ -80,7 +80,8 @@ class EKF:
     self.sensor_update(msg)
     
     self.publish_filter()
-      
+    
+    self.P = self.P*eye(6)
     
   def prediction(self, msg):
     # Model prediction
@@ -154,7 +155,8 @@ class EKF:
       vw.vector.y = msg.angular_velocity.y
       vw.vector.z = msg.angular_velocity.z
       vw = self.listener.transformVector3("/base_link", vw)
-      wm = vw.vector.z
+      wm = 0.95*sign(vw.vector.z)*sqrt(pow(vw.vector.z,2)+pow(vw.vector.x,2))
+      
 
       # Transform accelerometers into /base_link
       va = Vector3Stamped()
@@ -163,7 +165,8 @@ class EKF:
       va.vector.y = msg.linear_acceleration.y
       va.vector.z = msg.linear_acceleration.z
       va = self.listener.transformVector3("/base_link", va)
-      am = va.vector.x
+      am = va.vector.x - 0.151083895085
+      print va
     except:
       wm = 0.0
       am = 0.0
