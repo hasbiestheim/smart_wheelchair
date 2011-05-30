@@ -55,6 +55,7 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "imu_transformer");
   
   ros::NodeHandle n;
+  ros::NodeHandle nh_private("~");
 
   tf::TransformListener listener(ros::Duration(10));
   
@@ -62,7 +63,7 @@ int main(int argc, char **argv)
 
   ros::Subscriber imu_sub = n.subscribe<sensor_msgs::Imu>("imu", 100, boost::bind(&imuCallback,boost::ref(listener),_1));
   
-  n.param<std::string>("target_frame", tframeID, "/base_link");
+  nh_private.param("target_frame", tframeID, std::string("/base_link"));
 
   ros::spin();
 
