@@ -10,6 +10,7 @@
 // PARAMETERS
 size_t angular_slices_;
 size_t axial_slices_;
+double_t maximum_range_;
 
 ros::Publisher pcl_pub;
 
@@ -20,9 +21,9 @@ void rangeCallback(const sensor_msgs::Range::ConstPtr& msg)
 	float range = msg->range;
 	float field_of_view = msg->field_of_view;
 	// Compare to min to make sure not misfire
-	if(range >= msg->min_range && range <= msg->max_range){
+	if(range >= msg->min_range && range <= msg->max_range && range <= maximum_range_){
 	  pcl::PointCloud<pcl::PointXYZ> cloud;
-	  cloud.header.frame_id = frameID;
+	  cloud.header = msg->header;
 	  
 	  bool angular_odd = (angular_slices_ % 2 == 1);
 	  cloud.width = angular_slices_*axial_slices_;
@@ -62,6 +63,7 @@ void callback(otto_sensors::Range2PointConfig &config, uint32_t level)
 {
   angular_slices_ = config.angular_slices;
   axial_slices_ = config.radial_slices;
+  maximum_range_ = config.maximum_range;
 }
 
 int main(int argc, char **argv)
