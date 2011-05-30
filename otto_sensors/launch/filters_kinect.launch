@@ -26,7 +26,6 @@
 
   <!-- Fake Laser - Just for fun because it's cool. -->
   <node pkg="nodelet" type="nodelet" name="kinect_laser" args="load pointcloud_to_laserscan/CloudToScan kinect_nodelet">
-    <param name="output_frame_id" value="/openni_camera" />
     <remap from="cloud" to="/camera/depth/points" />
     <remap from="scan" to="/kinect_scan" />
   </node>

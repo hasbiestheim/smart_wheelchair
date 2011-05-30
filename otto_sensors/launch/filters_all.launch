@@ -1,0 +1,7 @@
+<launch>
+  
+  <include file="$(find otto_sensors)/launch/filters_kinect.launch" />
+  
+  <include file="$(find otto_sensors)/launch/filters_lasers.launch" />
+  
+</launch>

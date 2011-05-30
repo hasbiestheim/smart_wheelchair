@@ -1,31 +1,22 @@
 <launch>
 
-  <node pkg="joy" type="joy_node" name="joy_node">
-    <param name="autorepeat_rate" value="20.0" />
-    <param name="dev" type="string" value="/dev/input/js0" />
-  </node>
+  <include file="$(find wheelchair_base_controller)/launch/bringup_joy_simple.launch" />
 
-  <node pkg="wheelchair_base_controller" type="joy2twist.py" name="joytwisterizer">
+  <!--node pkg="wheelchair_base_controller" type="joy2twist.py" name="joytwisterizer">
     <rosparam file="$(find wheelchair_base_controller)/config/ottoControlConfig.yaml" command="load" />
   </node>
 
   <node pkg="wheelchair_base_controller" type="twist2joy.py" name="joyuntwister">
     <rosparam file="$(find wheelchair_base_controller)/config/ottoControlConfig.yaml" command="load" />
-  </node>
+  </node-->
 
-  <node pkg="wheelchair_base_controller" type="imu_quatcaster.py" name="imu_broadcaster">
+  <!--node pkg="wheelchair_base_controller" type="imu_quatcaster.py" name="imu_broadcaster">
     <param name="port_name" value="/dev/sensors/ftdi_A700eHSG" />
-  </node>
+  </node-->
 
-  <node pkg="wheelchair_base_controller" type="otto_ekf.py" name="Otto_EKF">
+  <!--node pkg="wheelchair_base_controller" type="otto_ekf.py" name="Otto_EKF">
     <rosparam file="$(find wheelchair_base_controller)/config/ottoEKFConfig.yaml" command="load" />
     <rosparam file="$(find wheelchair_base_controller)/config/ottoControlConfig.yaml" command="load" />
-  </node>
-
-
-  <node pkg="wheelchair_base_controller" type="joy2chair.py" name="joy2chair">
-    <param name="port_name" value="/dev/sensors/ftdi_A900ceGt" />
-    <remap from="joy" to="cmd_joy" />
-  </node>
+  </node-->
 
 </launch>

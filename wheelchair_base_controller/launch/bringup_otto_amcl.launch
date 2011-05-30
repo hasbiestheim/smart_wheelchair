@@ -1,31 +1,4 @@
 <launch>
-    <include file="$(find wheelchair_base_controller)/launch/bringup_otto_odom.launch" />
-
-    <node pkg="hokuyo_node" type="hokuyo_node" name="hokuyo_rear">
-	<param name="port" value="/dev/sensors/hokuyo_H0704874"/>
-        <param name="frame_id" value="hokuyo_rear_link"/>
-	<param name="min_ang" value="-2.10" />
-	<param name="max_ang" value="1.75" />
-        <remap from="scan" to="scan_rear" />
-    </node>
-
-    <node pkg="laser_filters" type="scan_to_scan_filter_chain" name="laser_filter_two">
-      <rosparam command="load" file="$(find wheelchair_base_controller)/config/lasershadow.yaml" />
-      <remap from="scan" to="scan_front" />
-    </node>
-
-    <node pkg="hokuyo_node" type="hokuyo_node" name="hokuyo_front">
-	<param name="port" value="/dev/sensors/hokuyo_H1000492"/>
-        <param name="frame_id" value="hokuyo_front_link"/>
-	<param name="min_ang" value="-2.10" />
-	<param name="max_ang" value="2.10" />
-        <remap from="scan" to="scan_front" />
-    </node>
-
-    <node pkg="tf" type="static_transform_publisher" name="hokuyo_rear_tf_pub" args="-0.31 0.04 0.3725 3.14159265358979 0 0 base_link hokuyo_rear_link 100" />
-
-    <node pkg="tf" type="static_transform_publisher" name="baser_laser" args="0.25 0 0.085 0 0 3.1415926535897 base_link hokuyo_front_link 100" />
-
     <node pkg="map_server" type="map_server" name="mappa" args="$(find cwru_maps)/maps/2nd_floor_one_door.yaml">
     </node>
 
@@ -64,6 +37,7 @@
       <param name="transform_tolerance" value="0.1"/>
       <param name="recovery_alpha_slow" value="0.0"/>
       <param name="recovery_alpha_fast" value="0.0"/>
-      <remap from="scan" to="base_scan" />
+      
+      <remap from="scan" to="/kinect_scan" />
     </node>
 </launch>
