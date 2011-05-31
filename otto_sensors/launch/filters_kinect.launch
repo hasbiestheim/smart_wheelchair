@@ -72,7 +72,6 @@
   
   
   <node pkg="pcl_decimator" type="pcl_decimator" name="pcl_slicer" output="screen">
-    <!--remap from="~input" to="/camera/depth/points_bubble_xx" /-->
     <rosparam>
       field_name: y
       num_slices: 5
