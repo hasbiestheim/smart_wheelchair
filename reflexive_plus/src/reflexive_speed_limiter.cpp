@@ -38,7 +38,6 @@ void joyCallback(const joy::Joy::ConstPtr& msg)
 	newJoy.buttons = msg->buttons;
 	
 	float vscale = scaleSaturate((frontVal_-frontRangeMin_)/(frontRangeMax_-frontRangeMin_));
-	std::cout << vscale << std::endl;
 	newJoy.axes[1] = vscale*newJoy.axes[1];
 
 	float wscale = scaleSaturate((sideVal_-sideRangeMin_)/(sideRangeMax_-sideRangeMin_));
