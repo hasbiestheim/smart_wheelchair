@@ -20,7 +20,9 @@ float sideVal_ = 1000.0;
 ros::Publisher joyout_pub;
 
 float joySaturate(float axis){
-  if(abs(axis) > joystickMax_){
+  if(abs(axis) < 0.05){
+    return 0.0;
+  } else if(abs(axis) > joystickMax_){
     return abs(axis)/axis * joystickMax_;
   } else if(abs(axis) < joystickMin_){
     return abs(axis)/axis * joystickMin_;
