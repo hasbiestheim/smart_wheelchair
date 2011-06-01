@@ -73,6 +73,7 @@ void laserCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
 	      }
 	    }
 	  }
+	  angle += msg->angle_increment;
 	}	
 }
 

@@ -27,13 +27,13 @@
       use_kinect: true
       num_points: 100
       use_sonars: true
-      front_sonar_thresh: 0.4
+      front_sonar_thresh: 0.35
       side_sonar_thresh: 0.3
       use_laser: true
-      front_laser_thresh: 0.4
-      front_laser_angle: 1.0
-      side_laser_thresh: 0.4
-      side_laser_angle: 1.0
+      front_laser_thresh: 0.5
+      front_laser_angle: 2.0
+      side_laser_thresh: 0.45
+      side_laser_angle: 2.0
     </rosparam>
   </node>
   
