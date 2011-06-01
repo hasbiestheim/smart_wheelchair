@@ -76,7 +76,8 @@ void laserCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
 	}	
 }
 
-bool rangerFrontAllow = true;
+bool rangerFrontLAllow = true;
+bool rangerFrontRAllow = true;
 bool rangerLeftAllow = true;
 bool rangerRightAllow = true;
 
@@ -90,14 +91,22 @@ void rangeCallback(const sensor_msgs::Range::ConstPtr& msg)
 	// Compare to min to make sure not misfire
 	if(range >= msg->min_range){
 		// Compare each sonar
-		if(frameID == "frontLeftSonar" || frameID == "frontRightSonar"){ 
+		if(frameID == "frontLeftSonar"){ 
 			if(range < rangeFrontThreshold_){
-				rangerFrontAllow = false;
+				rangerFrontLAllow = false;
 				ROS_DEBUG("Danger according to Front Rangers");
 			} else {
-				rangerFrontAllow = true;
+				rangerFrontLAllow = true;
 			}
-		} else if(frameID == "diagLeftSonar" || frameID == "diagRightSonar"){
+		} else if(frameID == "frontRightSonar"){
+		  	if(range < rangeFrontThreshold_){
+				rangerFrontRAllow = false;
+				ROS_DEBUG("Danger according to Front Rangers");
+			} else {
+				rangerFrontRAllow = true;
+			}
+		  
+		}else if(frameID == "diagLeftSonar" || frameID == "diagRightSonar"){
 
 		} else if(frameID == "sideLeftSonar"){
 			if(range < rangeSideThreshold_){
@@ -154,7 +163,7 @@ void joyCallback(const joy::Joy::ConstPtr& msg)
 	std_msgs::Bool collision_msg;
 	collision_msg.data = true;
 
-	if(((!laserFrontAllow && uselaser_) || (!rangerFrontAllow && useranger_) || (!kinectAllow && usekinect_)) && (newJoy.axes[1] > 0.0)){
+	if(((!laserFrontAllow && uselaser_) || ((!rangerFrontLAllow || !rangerFrontRAllow) && useranger_) || (!kinectAllow && usekinect_)) && (newJoy.axes[1] > 0.0)){
 		newJoy.axes[1] = 0.0;
 		collision_warn_pub.publish(collision_msg);
 	}
