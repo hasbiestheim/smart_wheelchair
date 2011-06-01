@@ -33,7 +33,6 @@ void rangeCallback(const tf::TransformListener& listener, const sensor_msgs::Ran
 	    geometry_msgs::Vector3Stamped newRange;
 	    listener.transformVector(tframeID, rangeVec, newRange);
 	    if(fabs(newRange.vector.x) > 0.01){
-		std::cout << forVals.front() << std::endl;
 		forVals.pop_front();
 		forVals.push_back(fabs(newRange.vector.x));
 		float avg = 0.0;
