@@ -43,11 +43,11 @@
     <remap from="joy" to="/joy" />
     <remap from="joy_output" to="/joy_limited" />
     <rosparam>
-      joystickMin: 0.2
-      frontRangeMin: 0.4
-      frontRangeMax: 4.0
-      sideRangeMin: 0.4
-      sideRangeMax: 4.0
+      joystickMin: 0.15
+      frontRangeMin: 0.5
+      frontRangeMax: 2.0
+      sideRangeMin: 0.5
+      sideRangeMax: 2.0
     </rosparam>
   </node>
   

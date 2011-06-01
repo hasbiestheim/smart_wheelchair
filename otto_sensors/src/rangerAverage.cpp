@@ -31,10 +31,11 @@ void rangeCallback(const tf::TransformListener& listener, const sensor_msgs::Ran
 	    rangeVec.vector.x = range;
 	    
 	    geometry_msgs::Vector3Stamped newRange;
-	    listener.transformVector(tframeID, ros::Time(0), rangeVec, rangeVec.header.frame_id, newRange);
-	    if(abs(newRange.vector.x) > 0.01){
+	    listener.transformVector(tframeID, rangeVec, newRange);
+	    if(fabs(newRange.vector.x) > 0.01){
+		std::cout << forVals.front() << std::endl;
 		forVals.pop_front();
-		forVals.push_back(abs(newRange.vector.x));
+		forVals.push_back(fabs(newRange.vector.x));
 		float avg = 0.0;
 		std::list<float>::iterator itr;
 		for(itr = forVals.begin(); itr != forVals.end(); itr++){
@@ -44,16 +45,16 @@ void rangeCallback(const tf::TransformListener& listener, const sensor_msgs::Ran
 		out.data = avg/(float)forVals.size();
 		for_pub.publish(out);
 	    }
-	    if(abs(newRange.vector.y) > 0.01){
+	    if(fabs(newRange.vector.y) > 0.01){
 		sideVals.pop_front();
-		sideVals.push_back(abs(newRange.vector.y));
+		sideVals.push_back(fabs(newRange.vector.y));
 		float avg = 0.0;
 		std::list<float>::iterator itr;
 		for(itr = sideVals.begin(); itr != sideVals.end(); itr++){
 		  avg += *itr;
 		}
 		std_msgs::Float32 out;
-		out.data = avg/(float)forVals.size();
+		out.data = avg/(float)sideVals.size();
 		side_pub.publish(out);
 	    }
 	}

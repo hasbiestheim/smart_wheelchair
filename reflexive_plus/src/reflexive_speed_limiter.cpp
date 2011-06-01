@@ -7,8 +7,7 @@
 #include <math.h>
 
 // PARAMETERS
-float joystickMin_ = 0.0;
-float joystickMax_ = 1.0;
+float joystickScaleMin_ = 0.0;
 float frontRangeMin_ = 0.0;
 float frontRangeMax_ = 1.0;
 float sideRangeMin_ = 0.0;
@@ -19,15 +18,13 @@ float sideVal_ = 1000.0;
 
 ros::Publisher joyout_pub;
 
-float joySaturate(float axis){
-  if(abs(axis) < 0.05){
-    return 0.0;
-  } else if(abs(axis) > joystickMax_){
-    return abs(axis)/axis * joystickMax_;
-  } else if(abs(axis) < joystickMin_){
-    return abs(axis)/axis * joystickMin_;
+float scaleSaturate(float scale){
+  if(scale < joystickScaleMin_){
+    return joystickScaleMin_;
+  } else if(scale > 1.0){
+    return 1.0;
   }
-  return axis;
+  return scale;
 }
 
 void joyCallback(const joy::Joy::ConstPtr& msg)
@@ -40,11 +37,12 @@ void joyCallback(const joy::Joy::ConstPtr& msg)
 	newJoy.axes = msg->axes;
 	newJoy.buttons = msg->buttons;
 	
-	float vscale = (frontVal_-frontRangeMin_)/(frontRangeMax_-frontRangeMin_);
-	newJoy.axes[1] = joySaturate(vscale*newJoy.axes[1]);
+	float vscale = scaleSaturate((frontVal_-frontRangeMin_)/(frontRangeMax_-frontRangeMin_));
+	std::cout << vscale << std::endl;
+	newJoy.axes[1] = vscale*newJoy.axes[1];
 
-	float wscale = (sideVal_-sideRangeMin_)/(sideRangeMax_-sideRangeMin_);
-	newJoy.axes[0] = joySaturate(wscale*newJoy.axes[0]);;
+	float wscale = scaleSaturate((sideVal_-sideRangeMin_)/(sideRangeMax_-sideRangeMin_));
+	newJoy.axes[0] = wscale*newJoy.axes[0];
 	
 	joyout_pub.publish(newJoy);
 }
@@ -59,7 +57,7 @@ void sideFloatCallback(const std_msgs::Float32::ConstPtr& msg){
 
 void callback(reflexive_plus::SpeedLimitConfig &config, uint32_t level)
 {
-  joystickMin_ = config.joystickMin;
+  joystickScaleMin_ = config.joystickScaleMin;
   frontRangeMin_ = config.frontRangeMin;
   frontRangeMax_ = config.frontRangeMax;
   sideRangeMin_ = config.sideRangeMin;
