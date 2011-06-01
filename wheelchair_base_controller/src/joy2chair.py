@@ -14,7 +14,7 @@ class Joy2Chair:
     port_name = rospy.get_param("~port_name", "/dev/ttyUSB0")
     self.port = serial.Serial(port_name, 115200)
     rospy.Subscriber('joy', Joy, self.processJoy)
-    rospy.Subscriber('collision_warning', Joy, self.processJoy)
+    #rospy.Subscriber('collision_warning', Bool, self.processJoy)
     self.pub = rospy.Publisher("motors_enabled", Bool)
     self.reflexAllow = True
     

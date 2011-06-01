@@ -6,9 +6,9 @@
 	<include file="$(find otto_sensors)/launch/tf_sonars.launch" />
 	
 	<node pkg="otto_sensors" type="rangerAverage" name="sonar_averager" output="screen">
-	  <remap from="~rangers" to="/sonars" />
-	  <remap from="~bubble/forward" to="/bubble/forward" />
-	  <remap from="~bubble/side" to="/bubble/side" />
+	  <remap from="rangers" to="/sonars" />
+	  <remap from="bubble/forward" to="/bubble/forward" />
+	  <remap from="bubble/side" to="/bubble/side" />
 	  <param name="num_samples" value="20" />
 	</node>
 </launch>

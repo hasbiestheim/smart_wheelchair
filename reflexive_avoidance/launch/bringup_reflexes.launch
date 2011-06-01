@@ -8,7 +8,7 @@
 
   <node pkg="wheelchair_base_controller" type="joy2chair.py" name="joy2chair" output="screen">
 	  <param name="port_name" value="/dev/sensors/ftdi_A600aivC" />
-	  <remap from="~joy" to="/joy_reflex" />
+	  <remap from="joy" to="/joy_reflex" />
   </node>
   
   <include file="$(find otto_sensors)/launch/bringup_lasers.launch" />
@@ -18,17 +18,17 @@
   <include file="$(find otto_sensors)/launch/bringup_kinect.launch" />
   
   <node pkg="reflexive_avoidance" type="reflexive_obstacle_avoidance" name="reflexive_halt" output="screen">
-    <remap from="~scan" to="/neato/scan_final" />
-    <remap from="~range" to="/sonars" />
-    <remap from="~input_cloud" to="/camera/depth/points_collision" />
-    <remap from="~joy" to="/joy" />
-    <remap from="~joy_output" to="/joy_reflex" />
+    <remap from="scan" to="/neato/scan_final" />
+    <remap from="range" to="/sonars" />
+    <remap from="input_cloud" to="/camera/depth/points_collision" />
+    <remap from="joy" to="/joy" />
+    <remap from="joy_output" to="/joy_reflex" />
     <rosparam>
       use_kinect: true
       num_points: 100
       use_sonars: true
-      front_sonar_thresh: 0.17
-      side_sonar_thresh: 0.17
+      front_sonar_thresh: 0.4
+      side_sonar_thresh: 0.3
       use_laser: true
       front_laser_thresh: 0.4
       front_laser_angle: 1.0

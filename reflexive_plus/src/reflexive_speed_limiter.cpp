@@ -7,12 +7,12 @@
 #include <math.h>
 
 // PARAMETERS
-float joystickMin_;
+float joystickMin_ = 0.0;
 float joystickMax_ = 1.0;
-float frontRangeMin_;
-float frontRangeMax_;
-float sideRangeMin_;
-float sideRangeMax_;
+float frontRangeMin_ = 0.0;
+float frontRangeMax_ = 1.0;
+float sideRangeMin_ = 0.0;
+float sideRangeMax_ = 1.0;
 
 float frontVal_ = 1000.0;
 float sideVal_ = 1000.0;
