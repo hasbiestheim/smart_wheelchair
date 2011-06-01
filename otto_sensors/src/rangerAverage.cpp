@@ -21,7 +21,6 @@ int N_;
 void rangeCallback(const tf::TransformListener& listener, const sensor_msgs::Range::ConstPtr& msg)
 {
     try{
-	listener.waitForTransform(tframeID, msg->header.frame_id, ros::Time::now(), ros::Duration(1.0));
 	// Record from message
 	std::string frameID = msg->header.frame_id;
 	float range = msg->range;
@@ -32,7 +31,7 @@ void rangeCallback(const tf::TransformListener& listener, const sensor_msgs::Ran
 	    rangeVec.vector.x = range;
 	    
 	    geometry_msgs::Vector3Stamped newRange;
-	    listener.transformVector(tframeID, rangeVec, newRange);
+	    listener.transformVector(tframeID, ros::Time(0), rangeVec, rangeVec.header.frame_id, newRange);
 	    if(abs(newRange.vector.x) > 0.01){
 		forVals.pop_front();
 		forVals.push_back(abs(newRange.vector.x));
@@ -75,7 +74,7 @@ int main(int argc, char **argv)
   
   tf::TransformListener listener(ros::Duration(10));
   
-  ros::Subscriber ranger_sub = n.subscribe<sensor_msgs::Range>("sonars", 100, boost::bind(&rangeCallback,boost::ref(listener),_1));
+  ros::Subscriber ranger_sub = n.subscribe<sensor_msgs::Range>("rangers", 100, boost::bind(&rangeCallback,boost::ref(listener),_1));
   
   nh_private.param("target_frame", tframeID, std::string("/base_link"));
   nh_private.param("num_samples", N_, 20);

@@ -180,6 +180,13 @@ void PrintQuaternion(void)
    q2 = 0.25*s;
   }
   
+  // Ensure normalized vectors for ROS
+  float magnitude = sqrt(q0*q0+q1*q1+q2*q2+q3*q3);
+  q0 = q0/magnitude;
+  q1 = q1/magnitude;
+  q2 = q2/magnitude;
+  q3 = q3/magnitude;
+  
   Serial.print("!");
   Serial.print("QUAT:");
   Serial.print(-q0);  
