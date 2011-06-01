@@ -1,12 +1,12 @@
 <launch>
   
-    <node pkg="laser_filters" type="scan_to_scan_filter_chain" name="laser_filter_hokuyo">
+    <node pkg="laser_filters" type="scan_to_scan_filter_chain" name="laser_filter_hokuyo" respawn="true">
       <rosparam command="load" file="$(find otto_sensors)/config/lasershadow.yaml" />
       <remap from="scan" to="/hokuyo/scan" />
       <remap from="scan_filtered" to="/hokuyo/scan_shadows" />
     </node>
     
-    <node pkg="otto_sensors" type="laserscan_threshold" name="hokuyo_threshold">
+    <node pkg="otto_sensors" type="laserscan_threshold" name="hokuyo_threshold" respawn="true">
       <remap from="scan" to="/hokuyo/scan_shadows" />
       <remap from="scan_filtered" to="/hokuyo/scan_final" />
       <rosparam>
@@ -17,7 +17,7 @@
       </rosparam>
     </node>
     
-    <node pkg="otto_sensors" type="laserscan_threshold" name="neato_threshold">
+    <node pkg="otto_sensors" type="laserscan_threshold" name="neato_threshold" respawn="true">
       <remap from="scan" to="/neato/scan" />
       <remap from="scan_filtered" to="/neato/scan_final" />
       <rosparam>

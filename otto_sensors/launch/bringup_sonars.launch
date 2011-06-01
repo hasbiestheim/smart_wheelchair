@@ -1,14 +1,14 @@
 <launch>
-	<node pkg="otto_sensors" type="sonarReader.py" name="sonarReader" output="screen">
+	<node pkg="otto_sensors" type="sonarReader.py" name="sonarReader" output="screen" respawn="true" >
 		<param name="port_name" value="/dev/sensors/ftdi_A900ceGt" />
 	</node>
 	
 	<include file="$(find otto_sensors)/launch/tf_sonars.launch" />
 	
-	<node pkg="otto_sensors" type="rangerAverage" name="sonar_averager" output="screen">
+	<node pkg="otto_sensors" type="rangerAverage" name="sonar_averager" output="screen" respawn="true" >
 	  <remap from="rangers" to="/sonars" />
 	  <remap from="bubble/forward" to="/bubble/forward" />
 	  <remap from="bubble/side" to="/bubble/side" />
-	  <param name="num_samples" value="20" />
+	  <param name="num_samples" value="240" />
 	</node>
 </launch>

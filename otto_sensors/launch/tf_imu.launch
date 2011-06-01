@@ -1,5 +1,5 @@
 <launch>
   <!-- The plastic enclouse box measures 3 degrees from the vertical, leaning away from the chair.  -3 degrees around the y axis. -->
   <!-- The IMU itself roughly has its x axis pointing down (-z), its y axis pointing user's right (-y), and its z axis pointing back (-x). -->
-  <node pkg="tf" type="static_transform_publisher" name="imu_static_tf_publisher" args="-0.28575 0.18796 0.7112 3.141592 1.56348974 0 base_link imu 100" />
+  <node pkg="tf" type="static_transform_publisher" name="imu_static_tf_publisher" respawn="true" args="-0.28575 0.18796 0.7112 3.141592 1.56348974 0 base_link imu 100" />
 </launch>

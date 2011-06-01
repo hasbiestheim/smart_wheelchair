@@ -3,6 +3,6 @@
   <include file="$(find openni_camera)/launch/kinect_frames.launch" />
   
   <!-- Transform from Otto's base_link to Otto's Kinect. -->
-  <node pkg="tf" type="static_transform_publisher" name="kinect_static_tf_pub" args="-0.4651 0 1.5572 0.017453 0.1047198 -0.017453 base_link openni_camera 100" />
+  <node pkg="tf" type="static_transform_publisher" name="kinect_static_tf_pub" respawn="true" args="-0.4651 0 1.5572 0.017453 0.1047198 -0.017453 base_link openni_camera 100" />
   
 </launch>

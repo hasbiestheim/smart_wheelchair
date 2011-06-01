@@ -17,7 +17,7 @@
   
   <include file="$(find otto_sensors)/launch/bringup_kinect.launch" />
   
-  <node pkg="reflexive_avoidance" type="reflexive_obstacle_avoidance" name="reflexive_halt" output="screen">
+  <node pkg="reflexive_avoidance" type="reflexive_obstacle_avoidance" name="reflexive_halt" output="screen" respawn="true" >
     <remap from="scan" to="/neato/scan_final" />
     <remap from="range" to="/sonars" />
     <remap from="input_cloud" to="/camera/depth/points_collision" />

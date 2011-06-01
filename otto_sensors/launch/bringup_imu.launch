@@ -1,5 +1,5 @@
 <launch>
-  <node pkg="otto_sensors" type="imu_quatcaster.py" name="imu_broadcaster" >
+  <node pkg="otto_sensors" type="imu_quatcaster.py" name="imu_broadcaster" respawn="true" >
     <param name="port_name" value="/dev/sensors/ftdi_A700eHSG" />
   </node>
   
