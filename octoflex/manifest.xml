@@ -8,6 +8,13 @@
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/octoflex</url>
+  <depend package="roscpp"/>
+  <depend package="tf"/>
+  <depend package="std_msgs"/>
+  <depend package="geometry_msgs"/>
+  <depend package="octocostmap" />
+  <depend package="dynamic_reconfigure" />
+  <depend package="driver_base" />
 
 </package>
 
