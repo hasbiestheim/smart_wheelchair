@@ -1,0 +1,20 @@
+<launch>
+
+  <node pkg="otto_sensors" type="rangerAverage" name="sonar_averager" output="screen" respawn="true" >
+    <remap from="rangers" to="/sonars" />
+    <remap from="bubble/forward" to="/bubble/forward" />
+    <remap from="bubble/side" to="/bubble/side" />
+    <param name="num_samples" value="240" />
+  </node>
+
+  <node pkg="otto_sensors" type="ranger2pointcloud" name="sonars2pointcloud" output="screen" respawn="true" >
+    <remap from="rangers" to="/sonars" />
+    <remape from="ranger_pointcloud" to="/ranger_pointcloud" />
+    <rosparam>
+      angular_slices: 10
+      radial_slices: 5
+      maximum_range: 6.0
+    </rosparam>
+  </node>
+
+</launch>

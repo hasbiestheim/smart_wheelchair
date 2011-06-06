@@ -6,7 +6,6 @@
 #include <tf/transform_listener.h>
 
 bool checkFullVolume_;
-float checkHeight_;
 float simTime_;
 int numSteps_;
 float length_;
@@ -17,18 +16,19 @@ float originOffsetY_;
 float originOffsetZ_;
 float resolution_;
 float rate_;
+float visPause_;
 
 geometry_msgs::Twist cmd_;
 boost::shared_ptr<octocostmap::Costmap3D> costmap_;
 ros::Timer loopTimer_;
 
-bool allowCommand(const tf::TransformListener& listener){
+void allowCommand(const tf::TransformListener& listener){
   float dt = simTime_/(float)numSteps_;
   // Offset current pose to the front left corner of the vehicle outline
   geometry_msgs::PoseStamped currentPose;
   currentPose.header.frame_id = "/base_link";
-  currentPose.pose.position.x = length_/2.0 - originOffsetX_;
-  currentPose.pose.position.y = width_/2.0 - originOffsetY_;
+  currentPose.pose.position.x = -length_/2.0 - originOffsetX_;
+  currentPose.pose.position.y = -width_/2.0 - originOffsetY_;
   currentPose.pose.position.z = originOffsetZ_;
   currentPose.pose.orientation = tf::createQuaternionMsgFromYaw(0.0);
   // Transform this into the map frame?
@@ -45,8 +45,8 @@ bool allowCommand(const tf::TransformListener& listener){
     float dTh = w*i*dt;
     float thNew = th + dTh;
     if(fabs(w) < 0.001){ // Straight line
-      dx = v*cos(th);
-      dy = v*sin(th);
+      dx = v*i*dt*cos(th);
+      dy = v*i*dt*sin(th);
     } else {
       float r = v/w;
       dx = -r*sin(th)+r*sin(thNew);
@@ -64,15 +64,13 @@ bool allowCommand(const tf::TransformListener& listener){
       bool collision_detected = costmap_->checkRectangularPrismBase(origin, width_, height_, length_, resolution_, checkFullVolume_);
       if(collision_detected){
 	ROS_DEBUG("Collision detected, do not execute command!");
-	return false;
       }
     } catch (tf::TransformException ex) {
       ROS_ERROR("%s", ex.what());
-      return false;
     }
+    ros::Duration(visPause_).sleep();
   }
   // Did not detect a collision, so assume this control is safe!
-  return true;
 }
 
 void twistCallback(const geometry_msgs::Twist::ConstPtr& msg){
@@ -82,7 +80,6 @@ void twistCallback(const geometry_msgs::Twist::ConstPtr& msg){
 void callback(octoflex::OctoFlexConfig &config, uint32_t level)
 {
   checkFullVolume_ = config.checkFullVolume;
-  checkHeight_ = config.checkHeight;
   simTime_ = config.forwardTime;
   numSteps_ = config.numberOfSteps;
   length_ = config.length;
@@ -93,6 +90,7 @@ void callback(octoflex::OctoFlexConfig &config, uint32_t level)
   originOffsetZ_ = config.originOffsetZ;
   resolution_ = config.resolution;
   rate_ = config.rate;
+  visPause_ = config.visualizationPause;
   loopTimer_.setPeriod(ros::Duration(1.0/rate_));
 }
 

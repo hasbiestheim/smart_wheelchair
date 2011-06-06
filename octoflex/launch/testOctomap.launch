@@ -1,8 +1,14 @@
 <launch>
   <node pkg="octocostmap" type="octocostmap" name="octomapper">
-    <param name="map_frame" value="/openni_camera" />
+    <param name="map_frame" value="/odom" />
     <param name="map_resolution" value="0.025" />
-    <remap from="cloud" to="/camera/depth/points_passthrough" />
+    <param name="scan_buffer" value="1" />
+    <param name="pc_buffer" value="1" />
+    <param name="pc_buffer2" value="1" />
+    <param name="publish_frequency" value="100" />
+    <remap from="scan" to="/neato/scan_final" />
+    <remap from="cloud" to="/camera/depth/points_sliced" />
+    <remap from="cloud2" to ="/ranger_pointcloud" />
   </node>
 
 </launch>

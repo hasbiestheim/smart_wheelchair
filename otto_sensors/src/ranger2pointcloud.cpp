@@ -80,7 +80,7 @@ int main(int argc, char **argv)
   angular_slices_ = 4;
   axial_slices_ = 3;
 
-  ros::Subscriber ranger_sub = n.subscribe("sonars", 100, rangeCallback);
+  ros::Subscriber ranger_sub = n.subscribe("rangers", 100, rangeCallback);
 
   ros::spin();
 
