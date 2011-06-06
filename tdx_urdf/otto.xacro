@@ -1,0 +1,319 @@
+<?xml version="1.0"?>
+<robot name="materials" xmlns:xacro="http://www.ros.org/wiki/xacro" >
+  <xacro:property name="pi" value="3.14159265358979" />
+  
+  <!-- The total size for the collision boudning box. -->
+  <xacro:property name="colllen" value="0.4318" />
+  <xacro:property name="collwidth" value="0.3302" />
+  <xacro:property name="collheight" value="0.254" />
+  <!-- The size of the battery box/area between the drive wheels. -->
+  <xacro:property name="battlen" value="0.4318" />
+  <xacro:property name="battwidth" value="0.3302" />
+  <xacro:property name="battheight" value="0.254" />
+  <link name="base_link">
+  </link>
+  
+  <!-- Main battery box -->
+  <link name="battery_box">
+    <visual>
+      <geometry>
+	<box size="${battlen} ${battwidth} ${battheight}"/>
+      </geometry>
+      <material name="black">
+	<color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+	<box size="${colllen} ${collwidth} ${collheight}"/>
+      </geometry>
+      <material name="collision">
+	<color rgba="1 0 0 0.2"/>
+      </material>
+    </collision>
+  </link>
+  
+  <joint name="base_to_batt_box" type="fixed">
+    <parent link="base_link"/>
+    <child link="battery_box"/>
+    <origin xyz="0 0 ${battheight/2.0+0.04445}"/>
+  </joint>
+  
+  <!-- Tires and drive motors -->
+  <xacro:property name="tireradius" value="0.1651" />
+  <xacro:property name="tirewidth" value="0.0635" />
+  <xacro:property name="hubradius" value="0.11" />
+  <xacro:property name="hubwidth" value="0.05" />
+  <xacro:property name="motorradius" value="0.0762" />
+  <xacro:property name="motorwidth" value="0.1016" />
+  
+  <xacro:macro name="drivewheel" params="prefix reflect">
+      <link name="${prefix}_motor">
+      <visual>
+	<geometry>
+	  <cylinder length="${motorwidth}" radius="${motorradius}"/>
+	</geometry>
+	<origin xyz="0 0 0" rpy="0 0 0"/>
+	<material name="motor">
+	  <color rgba="0.25 0.25 0.25 1"/>
+	</material>
+      </visual>
+    </link>
+
+    <joint name="battery_to_${prefix}_motor" type="fixed">
+      <parent link="battery_box"/>
+      <child link="${prefix}_motor"/>
+      <origin xyz="0 ${reflect*(battwidth/2.0+motorwidth/2.0)} 0" rpy="${pi/2} 0 0"/>
+    </joint>
+    
+    <link name="${prefix}_drive_wheel">
+      <visual>
+	<geometry>
+	  <cylinder length="${tirewidth}" radius="${tireradius}"/>
+	</geometry>
+	<origin xyz="0 0 0" rpy="0 0 0"/>
+	<material name="tire">
+	  <color rgba="0.65 0.65 0.6 1"/>
+	</material>
+      </visual>
+    </link>
+
+    <joint name="motor_to_${prefix}_drive_wheel" type="fixed">
+      <parent link="${prefix}_motor"/>
+      <child link="${prefix}_drive_wheel"/>
+      <origin xyz="0 0 ${-reflect*(motorwidth/2.0+tirewidth/2.0)}" rpy="0 0 0"/>
+    </joint>
+    
+    <link name="${prefix}_wheel_hub">
+      <visual>
+	<geometry>
+	  <cylinder length="${hubwidth}" radius="${hubradius}"/>
+	</geometry>
+	<origin xyz="0 0 0" rpy="0 0 0"/>
+	<material name="black_hub">
+	  <color rgba="0.05 0.05 0.05 1"/>
+	</material>
+      </visual>
+    </link>
+
+    <joint name="wheel_to_${prefix}_hub" type="fixed">
+      <parent link="${prefix}_drive_wheel"/>
+      <child link="${prefix}_wheel_hub"/>
+      <origin xyz="0 0 ${-reflect*0.02}" rpy="0 0 0"/>
+    </joint>
+  </xacro:macro>
+  <xacro:drivewheel prefix="right" reflect="-1" />
+  <xacro:drivewheel prefix="left" reflect="1" />
+  
+  <!-- Rider Cushion -->
+  <xacro:property name="seatlen" value="0.4445" />
+  <xacro:property name="seatwidth" value="0.4318" />
+  <xacro:property name="seatheight" value="0.0762" />
+  <link name="rider_seat">
+    <visual>
+      <geometry>
+	<box size="${seatlen} ${seatwidth} ${seatheight}"/>
+      </geometry>
+      <material name="black">
+	<color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+  </link>
+  
+  <joint name="batt_to_seat" type="fixed">
+    <parent link="battery_box"/>
+    <child link="rider_seat"/>
+    <origin xyz="0.13 0 0.2"/>
+  </joint>
+  
+  <!-- Rider Back -->
+  <xacro:property name="backdepth" value="0.1143" />
+  <xacro:property name="backwidth" value="0.4318" />
+  <xacro:property name="backheight" value="0.4572" />
+  <link name="rider_back">
+    <visual>
+      <geometry>
+	<box size="${backdepth} ${backwidth} ${backheight}"/>
+      </geometry>
+      <material name="black">
+	<color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+  </link>
+  
+  <joint name="batt_to_back" type="fixed">
+    <parent link="battery_box"/>
+    <child link="rider_back"/>
+    <origin xyz="-0.18 0 0.4"/>
+  </joint>
+  
+  <!-- Macro for the rear casters -->
+  <xacro:property name="casterradius" value="0.0762" />
+  <xacro:property name="casterwidth" value="0.0381" />
+  <xacro:property name="casterheight" value="0.15" />
+  
+  <xacro:macro name="rearcaster" params="prefix reflect">
+    <link name="${prefix}_caster_leg">
+      <visual>
+	<geometry>
+	  <box size="0.04445 0.04445 ${casterheight}"/>
+	</geometry>
+	<origin xyz="0 0 0" rpy="0 0 0"/>
+	<material name="black">
+	  <color rgba="0 0 0 1"/>
+	</material>
+      </visual>
+    </link>
+    
+    <link name="${prefix}_caster">
+      <visual>
+	<geometry>
+	  <cylinder length="${casterwidth}" radius="${casterradius}"/>
+	</geometry>
+	<material name="caster">
+	  <color rgba="0.55 0.55 0.44 1"/>
+	</material>
+      </visual>
+    </link>
+
+    <joint name="${prefix}_caster_leg_to_${prefix}_caster" type="fixed">
+      <parent link="${prefix}_caster_leg"/>
+      <child link="${prefix}_caster"/>
+      <origin xyz="0 0 -0.03" rpy="${pi/2} 0 0"/>
+    </joint>
+    
+    <link name="${prefix}_caster_bar">
+      <visual>
+	<geometry>
+	  <cylinder length="0.1524" radius="0.02"/>
+	</geometry>
+	<origin xyz="0 0 0" rpy="0 ${pi/2.0} 0"/>
+	<material name="silver">
+	  <color rgba="0.3 0.3 0.35 1"/>
+	</material>
+      </visual>
+    </link>
+    
+    <joint name="${prefix}_caster_bar_joint" type="fixed">
+      <parent link="${prefix}_caster_bar"/>
+      <child link="${prefix}_caster_leg"/>
+      <origin xyz="-0.0712 0 ${-casterradius}" rpy="0 -0.2 0"/>
+    </joint>
+    
+    <joint name="${prefix}_to_caster" type="fixed">
+      <parent link="battery_box"/>
+      <child link="${prefix}_caster_bar"/>
+      <origin xyz="${-battlen/2.0-0.0712/2.0} ${reflect*0.12} 0" rpy="0 0 0"/>
+    </joint>
+  </xacro:macro>
+  <xacro:rearcaster prefix="back_right" reflect="-1" />
+  <xacro:rearcaster prefix="back_left" reflect="1" />
+  
+  <!-- Leg Rests -->
+  <xacro:property name="legrestlength" value="0.2032" />
+  <xacro:property name="legrestheight" value="0.254" />
+  <xacro:property name="legrestfootdepth" value="0.14" />
+  <xacro:property name="legrestfootwidth" value="0.20" />
+  <xacro:property name="legresttuberadius" value="0.01" />
+  
+  <xacro:macro name="legrest" params="prefix reflect">
+    <link name="${prefix}_legrest_horizontal">
+      <visual>
+	<geometry>
+	  <cylinder length="${legrestlength}" radius="${legresttuberadius}"/>
+	</geometry>
+	<origin xyz="0 0 0" rpy="0 0 0"/>
+	<material name="black">
+	  <color rgba="0 0 0 1"/>
+	</material>
+      </visual>
+    </link>
+
+    <joint name="${prefix}_legrest_to_batt" type="fixed">
+      <parent link="battery_box"/>
+      <child link="${prefix}_legrest_horizontal"/>
+      <origin xyz="0.42 ${reflect*0.21} 0.15" rpy="0 ${pi/2} 0"/>
+    </joint>
+    
+    <link name="${prefix}_legrest_vertical">
+      <visual>
+	<geometry>
+	  <cylinder length="${legrestheight}" radius="${legresttuberadius}"/>
+	</geometry>
+	<origin xyz="0 0 ${legrestheight/2.0}" rpy="0 0 0"/>
+	<material name="black">
+	  <color rgba="0 0 0 1"/>
+	</material>
+      </visual>
+    </link>
+
+    <joint name="${prefix}_legrest_connection" type="fixed">
+      <parent link="${prefix}_legrest_horizontal"/>
+      <child link="${prefix}_legrest_vertical"/>
+      <origin xyz="0 0 ${legrestlength/2.0-legresttuberadius/2.0}" rpy="0 ${pi/2-0.4} 0"/>
+    </joint>
+    
+    <link name="${prefix}_footrest">
+      <visual>
+	<geometry>
+	  <box size="${legrestfootdepth} ${legrestfootwidth} 0.0254"/>
+	</geometry>
+	<origin xyz="0 0 0" rpy="0 0 0"/>
+	<material name="black">
+	  <color rgba="0 0 0 1"/>
+	</material>
+      </visual>
+    </link>
+
+    <joint name="${prefix}_footrest_connection" type="fixed">
+      <parent link="${prefix}_legrest_vertical"/>
+      <child link="${prefix}_footrest"/>
+      <origin xyz="0 ${-reflect*legrestfootwidth/2.0} ${legrestlength+0.04}" rpy="0 0.4 0"/>
+    </joint>
+  </xacro:macro>
+  <xacro:legrest prefix="right" reflect="-1" />
+  <xacro:legrest prefix="left" reflect="1" />
+  
+  <!-- Kinect Bar -->
+  <xacro:property name="bardepth" value="0.0381" />
+  <xacro:property name="barwidth" value="0.0762" />
+  <xacro:property name="barheight" value="0.9525" />
+  <link name="kinect_bar">
+    <visual>
+      <geometry>
+	<box size="${bardepth} ${barwidth} ${barheight}"/>
+      </geometry>
+      <material name="black">
+	<color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+  </link>
+  
+  <joint name="back_to_bar" type="fixed">
+    <parent link="rider_back"/>
+    <child link="kinect_bar"/>
+    <origin xyz="${-bardepth/2.0-backdepth/2.0} 0 ${barheight/2.0+backheight/2.0-0.127}"/>
+  </joint>
+  
+  <!-- Kinect -->
+  <xacro:property name="kinectdepth" value="0.0635" />
+  <xacro:property name="kinectwidth" value="0.2794" />
+  <xacro:property name="kinectheight" value="0.0381" />
+  <link name="kinect">
+    <visual>
+      <geometry>
+	<box size="${kinectdepth} ${kinectwidth} ${kinectheight}"/>
+      </geometry>
+      <material name="kinect">
+	<color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+  </link>
+  
+  <joint name="kinect_to_bar" type="fixed">
+    <parent link="kinect_bar"/>
+    <child link="kinect"/>
+    <origin xyz="${kinectdepth/2.0+barwidth/2.0} 0 ${barheight/2.0-0.1016}" rpy="0 0.2 0" />
+  </joint>
+  
+</robot>
