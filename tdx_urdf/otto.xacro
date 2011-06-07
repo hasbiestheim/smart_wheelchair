@@ -3,9 +3,9 @@
   <xacro:property name="pi" value="3.14159265358979" />
   
   <!-- The total size for the collision boudning box. -->
-  <xacro:property name="colllen" value="0.4318" />
-  <xacro:property name="collwidth" value="0.3302" />
-  <xacro:property name="collheight" value="0.254" />
+  <xacro:property name="colllen" value="1.14" />
+  <xacro:property name="collwidth" value="0.66" />
+  <xacro:property name="collheight" value="1.5" />
   <!-- The size of the battery box/area between the drive wheels. -->
   <xacro:property name="battlen" value="0.4318" />
   <xacro:property name="battwidth" value="0.3302" />
@@ -28,7 +28,7 @@
 	<box size="${colllen} ${collwidth} ${collheight}"/>
       </geometry>
       <material name="collision">
-	<color rgba="1 0 0 0.2"/>
+	<color rgba="1 0 0 0.5"/>
       </material>
     </collision>
   </link>
