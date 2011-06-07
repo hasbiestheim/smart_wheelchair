@@ -4,3 +4,7 @@ lib/
 *.swp
 *.pyc
 *.pyo
+docs/
+cfg/
+#This following line takes care of both cfgs in the package level as well as src/cfg.  If we add custom messages, this might have to be changed.
+!cfg/*.cfg
