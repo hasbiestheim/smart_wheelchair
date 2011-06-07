@@ -1,0 +1,12 @@
+<launch>
+  <node pkg="octocostmap" type="octocostmap" name="octomapper">
+    <param name="map_frame" value="/odom" />
+    <param name="map_resolution" value="0.025" />
+    <param name="scan_buffer" value="1" />
+    <param name="pc_buffer" value="1" />
+    <param name="publish_frequency" value="100" />
+    <remap from="scan" to="/neato/scan_final" />
+    <remap from="cloud" to="/camera/depth/points_sliced" />
+  </node>
+
+</launch>
