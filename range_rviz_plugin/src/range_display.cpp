@@ -46,6 +46,7 @@ RangeDisplay::~RangeDisplay()
 void RangeDisplay::clear()
 {
   setBuffer( cones_.size() );
+  tf_filter_.clear();
   messages_received_ = 0;
   setStatus(rviz::status_levels::Warn, "Topic", "No messages received");
 }
@@ -147,9 +148,8 @@ void RangeDisplay::onDisable()
 
 void RangeDisplay::fixedFrameChanged()
 {
-  clear();
-
   tf_filter_.setTargetFrame( fixed_frame_ );
+  clear();
 }
 
 void RangeDisplay::update(float wall_dt, float ros_dt)
