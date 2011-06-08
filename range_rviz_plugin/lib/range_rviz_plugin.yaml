@@ -1,0 +1,9 @@
+name: range_rviz_plugin
+library: range_rviz_plugin
+displays:
+  -
+    class_name: range_rviz_plugin::RangeDisplay
+    display_name: Range
+    description: |
+      Displays the data from a sensor_msgs::Range message as cones.
+

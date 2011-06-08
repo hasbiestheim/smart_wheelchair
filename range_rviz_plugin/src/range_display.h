@@ -28,8 +28,8 @@
  */
 
 
-#ifndef NXT_ULTRASONIC_DISPLAY_H
-#define NXT_ULTRASONIC_DISPLAY_H
+#ifndef RANGE_DISPLAY_H
+#define RANGE_DISPLAY_H
 
 #include "rviz/display.h"
 #include "rviz/helpers/color.h"
@@ -53,18 +53,18 @@ namespace Ogre
 class SceneNode;
 }
 
-namespace nxt_rviz_plugin
+namespace range_rviz_plugin
 {
 
 /**
- * \class NXTUltrasonicDisplay
- * \brief Displays a nxt_msgs::Range message
+ * \class RangeDisplay
+ * \brief Displays a sensor_msgs::Range message
  */
-class NXTUltrasonicDisplay : public rviz::Display
+class RangeDisplay : public rviz::Display
 {
 public:
-  NXTUltrasonicDisplay( const std::string& name, rviz::VisualizationManager* manager );
-  virtual ~NXTUltrasonicDisplay();
+  RangeDisplay( const std::string& name, rviz::VisualizationManager* manager );
+  virtual ~RangeDisplay();
 
   void setTopic( const std::string& topic );
   const std::string& getTopic() { return topic_; }
@@ -120,7 +120,7 @@ protected:
   rviz::IntPropertyWPtr bufferLen_property_;
 };
 
-} // namespace nxt_rviz_plugin
+} // namespace range_plugin
 
-#endif /* NXT_ULTRASONIC_DISPLAY_H */
+#endif /* RANGE_DISPLAY_H */
 

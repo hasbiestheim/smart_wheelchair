@@ -1,7 +1,7 @@
 <package>
   <description brief="ranger_rviz_plugin">
 
-     ranger_rviz_plugin provides plugins for rviz for visualizing data coming from the rangers. 
+     ranger_rviz_plugin provides plugins for rviz for visualizing data coming from ranger sensors. 
 
   </description>
   <author>Melonee Wise, Chad Rockey</author>
@@ -13,7 +13,7 @@
   <depend package="tf"/>
 
   <export>
-    <rviz plugin="${prefix}/lib/nxt_rviz_plugin.yaml"/>
+    <rviz plugin="${prefix}/lib/range_rviz_plugin.yaml"/>
   </export>
 
 

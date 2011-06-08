@@ -1,4 +1,4 @@
-#include "nxt_ultrasonic_display.h"
+#include "range_display.h"
 #include "rviz/visualization_manager.h"
 #include "rviz/properties/property.h"
 #include "rviz/properties/property_manager.h"
@@ -13,15 +13,14 @@
 #include <OGRE/OgreSceneNode.h>
 #include <OGRE/OgreSceneManager.h>
 
-namespace nxt_rviz_plugin
+namespace range_rviz_plugin
 {
-NXTUltrasonicDisplay::NXTUltrasonicDisplay( const std::string& name, rviz::VisualizationManager* manager )
+RangeDisplay::RangeDisplay( const std::string& name, rviz::VisualizationManager* manager )
 : Display( name, manager )
-, color_( 0.0f, 1.0f, 0.0f )
+, color_( 1.0f, 1.0f, 1.0f )
 , messages_received_(0)
 , tf_filter_(*manager->getTFClient(), "", 10, update_nh_)
 {
-  setAlpha( 0.0f );
   scene_node_ = scene_manager_->getRootSceneNode()->createChildSceneNode();
   scene_node_->setVisible( false );
   
@@ -30,12 +29,12 @@ NXTUltrasonicDisplay::NXTUltrasonicDisplay( const std::string& name, rviz::Visua
   rviz::scaleRobotToOgre( scale );
 
   tf_filter_.connectInput(sub_);
-  tf_filter_.registerCallback(boost::bind(&NXTUltrasonicDisplay::incomingMessage, this, _1));
+  tf_filter_.registerCallback(boost::bind(&RangeDisplay::incomingMessage, this, _1));
   vis_manager_->getFrameManager()->registerFilterForTransformStatusCheck(tf_filter_, this);
   setAlpha( 0.5f );
 }
 
-NXTUltrasonicDisplay::~NXTUltrasonicDisplay()
+RangeDisplay::~RangeDisplay()
 {
   unsubscribe();
   clear();
@@ -44,14 +43,14 @@ NXTUltrasonicDisplay::~NXTUltrasonicDisplay()
   }
 }
 
-void NXTUltrasonicDisplay::clear()
+void RangeDisplay::clear()
 {
   setBuffer( cones_.size() );
   messages_received_ = 0;
   setStatus(rviz::status_levels::Warn, "Topic", "No messages received");
 }
 
-void NXTUltrasonicDisplay::setTopic( const std::string& topic )
+void RangeDisplay::setTopic( const std::string& topic )
 {
   unsubscribe();
 
@@ -64,7 +63,7 @@ void NXTUltrasonicDisplay::setTopic( const std::string& topic )
   causeRender();
 }
 
-void NXTUltrasonicDisplay::setColor( const rviz::Color& color )
+void RangeDisplay::setColor( const rviz::Color& color )
 {
   color_ = color;
 
@@ -74,7 +73,7 @@ void NXTUltrasonicDisplay::setColor( const rviz::Color& color )
   causeRender();
 }
 
-void NXTUltrasonicDisplay::setBuffer( int buffer )
+void RangeDisplay::setBuffer( int buffer )
 {
   if(buffer < 1)
     buffer = 1;
@@ -108,7 +107,7 @@ void NXTUltrasonicDisplay::setBuffer( int buffer )
   
 }
 
-void NXTUltrasonicDisplay::setAlpha( float alpha )
+void RangeDisplay::setAlpha( float alpha )
 {
   alpha_ = alpha;
 
@@ -118,7 +117,7 @@ void NXTUltrasonicDisplay::setAlpha( float alpha )
   causeRender();
 }
 
-void NXTUltrasonicDisplay::subscribe()
+void RangeDisplay::subscribe()
 {
   if ( !isEnabled() )
   {
@@ -128,37 +127,37 @@ void NXTUltrasonicDisplay::subscribe()
   sub_.subscribe(update_nh_, topic_, 10);
 }
 
-void NXTUltrasonicDisplay::unsubscribe()
+void RangeDisplay::unsubscribe()
 {
   sub_.unsubscribe();
 }
 
-void NXTUltrasonicDisplay::onEnable()
+void RangeDisplay::onEnable()
 {
   scene_node_->setVisible( true );
   subscribe();
 }
 
-void NXTUltrasonicDisplay::onDisable()
+void RangeDisplay::onDisable()
 {
   unsubscribe();
   clear();
   scene_node_->setVisible( false );
 }
 
-void NXTUltrasonicDisplay::fixedFrameChanged()
+void RangeDisplay::fixedFrameChanged()
 {
   clear();
 
   tf_filter_.setTargetFrame( fixed_frame_ );
 }
 
-void NXTUltrasonicDisplay::update(float wall_dt, float ros_dt)
+void RangeDisplay::update(float wall_dt, float ros_dt)
 {
 }
 
 
-void NXTUltrasonicDisplay::processMessage(const sensor_msgs::Range::ConstPtr& msg)
+void RangeDisplay::processMessage(const sensor_msgs::Range::ConstPtr& msg)
 {
   if (!msg)
   {
@@ -196,38 +195,38 @@ void NXTUltrasonicDisplay::processMessage(const sensor_msgs::Range::ConstPtr& ms
 
 }
 
-void NXTUltrasonicDisplay::incomingMessage(const sensor_msgs::Range::ConstPtr& msg)
+void RangeDisplay::incomingMessage(const sensor_msgs::Range::ConstPtr& msg)
 {
   processMessage(msg);
 }
 
-void NXTUltrasonicDisplay::reset()
+void RangeDisplay::reset()
 {
   Display::reset();
   clear();
 }
 
-void NXTUltrasonicDisplay::createProperties()
+void RangeDisplay::createProperties()
 {
-  topic_property_ = property_manager_->createProperty<rviz::ROSTopicStringProperty>( "Topic", property_prefix_, boost::bind( &NXTUltrasonicDisplay::getTopic, this ),
-                                                                                boost::bind( &NXTUltrasonicDisplay::setTopic, this, _1 ), parent_category_, this );
-  setPropertyHelpText(topic_property_, "nxt_msgs::Ranger topic to subscribe to.");
+  topic_property_ = property_manager_->createProperty<rviz::ROSTopicStringProperty>( "Topic", property_prefix_, boost::bind( &RangeDisplay::getTopic, this ),
+                                                                                boost::bind( &RangeDisplay::setTopic, this, _1 ), parent_category_, this );
+  setPropertyHelpText(topic_property_, "sensor_msgs::Range topic to subscribe to.");
   rviz::ROSTopicStringPropertyPtr topic_prop = topic_property_.lock();
   topic_prop->setMessageType(ros::message_traits::datatype<sensor_msgs::Range>());
-  color_property_ = property_manager_->createProperty<rviz::ColorProperty>( "Color", property_prefix_, boost::bind( &NXTUltrasonicDisplay::getColor, this ),
-                                                                      boost::bind( &NXTUltrasonicDisplay::setColor, this, _1 ), parent_category_, this );
+  color_property_ = property_manager_->createProperty<rviz::ColorProperty>( "Color", property_prefix_, boost::bind( &RangeDisplay::getColor, this ),
+                                                                      boost::bind( &RangeDisplay::setColor, this, _1 ), parent_category_, this );
   setPropertyHelpText(color_property_, "Color to draw the range.");
-  alpha_property_ = property_manager_->createProperty<rviz::FloatProperty>( "Alpha", property_prefix_, boost::bind( &NXTUltrasonicDisplay::getAlpha, this ),
-                                                                       boost::bind( &NXTUltrasonicDisplay::setAlpha, this, _1 ), parent_category_, this );
+  alpha_property_ = property_manager_->createProperty<rviz::FloatProperty>( "Alpha", property_prefix_, boost::bind( &RangeDisplay::getAlpha, this ),
+                                                                       boost::bind( &RangeDisplay::setAlpha, this, _1 ), parent_category_, this );
   setPropertyHelpText(alpha_property_, "Amount of transparency to apply to the range.");
-  bufferLen_property_ = property_manager_->createProperty<rviz::IntProperty>( "Buffer Length", property_prefix_, boost::bind( &NXTUltrasonicDisplay::getBuffer, this ),
-                                                                       boost::bind( &NXTUltrasonicDisplay::setBuffer, this, _1 ), parent_category_, this );
+  bufferLen_property_ = property_manager_->createProperty<rviz::IntProperty>( "Buffer Length", property_prefix_, boost::bind( &RangeDisplay::getBuffer, this ),
+                                                                       boost::bind( &RangeDisplay::setBuffer, this, _1 ), parent_category_, this );
   setPropertyHelpText(bufferLen_property_, "Number of prior measurements to display.");
   
 }
 
-const char* NXTUltrasonicDisplay::getDescription()
+const char* RangeDisplay::getDescription()
 {
-  return "Displays data from a nxt_msgs::Range message as a cone.";
+  return "Displays data from a sensor_msgs::Range message as a cone.";
 }
-} // namespace nxt_rviz_plugin
+} // namespace ranger_rviz_plugin
