@@ -16,6 +16,12 @@
   <depend package="pcl"/>
   <depend package="dynamic_reconfigure" />
   <depend package="driver_base" />
+  <depend package="hokuyo_node" />
+  <depend package="xv_11_laser_driver" />
+  <depend package="openni_camera" />
+  <depend package="laser_filters" />
+  <depend package="pointcloud_to_laserscan" />
+  <depend package="pcl_decimator" />
   
   <rosdep name="python-serial" />
 

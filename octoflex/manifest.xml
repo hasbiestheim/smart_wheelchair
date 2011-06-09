@@ -16,6 +16,9 @@
   <depend package="dynamic_reconfigure" />
   <depend package="driver_base" />
   <depend package="joy" />
+  <depend package="wheelchair_base_controller" />
+  <depend package="reflexive_avoidance" />
+  <depend package="reflexive_plus" />
 
 </package>
 

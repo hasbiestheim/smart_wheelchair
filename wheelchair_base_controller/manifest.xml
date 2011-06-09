@@ -17,6 +17,8 @@
   <depend package="sensor_msgs"/>
   <depend package="nav_msgs"/>
   <depend package="tf"/>
+  <depend package="amcl" />
+  <depend package="map_server" />
   
   <rosdep name="python-serial" />
 
