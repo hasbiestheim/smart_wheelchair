@@ -1,23 +1,21 @@
 <launch>
-  
-  <node pkg="joy" type="joy_node" name="joy_node">
+
+  <node pkg="joy" type="joy_node" name="joy_node" respawn="true" >
 	  <param name="autorepeat_rate" value="20.0" />
 	  <param name="dev" type="string" value="/dev/input/js0" />
 	  <param name="deadzone" value="0.12" />
   </node>
 
-  <node pkg="wheelchair_base_controller" type="joy2chair.py" name="joy2chair" output="screen">
+  <node pkg="wheelchair_base_controller" type="joy2chair.py" name="joy2chair" output="screen" respawn="true" >
 	  <param name="port_name" value="/dev/sensors/ftdi_A600aivC" />
 	  <remap from="joy" to="/joy_reflex" />
   </node>
+
+  <node pkg="wheelchair_base_controller" type="joy2twist.py" name="joytwisterizer" respawn="true" />
+
+  <node pkg="wheelchair_base_controller" type="otto_ekf.py" name="Otto_EKF" respawn="true" />
   
-  <include file="$(find otto_sensors)/launch/bringup_lasers.launch" />
-  
-  <include file="$(find otto_sensors)/launch/bringup_sonars.launch" />
-  
-  <include file="$(find otto_sensors)/launch/bringup_kinect.launch" />
-  
-  <node pkg="reflexive_avoidance" type="reflexive_obstacle_avoidance" name="reflexive_halt" output="screen">
+  <node pkg="reflexive_avoidance" type="reflexive_obstacle_avoidance" name="reflexive_halt" output="screen" respawn="true" >
     <remap from="scan" to="/neato/scan_final" />
     <remap from="range" to="/sonars" />
     <remap from="input_cloud" to="/camera/depth/points_collision" />
