@@ -2,6 +2,7 @@
 #include <dynamic_reconfigure/server.h>
 #include <octoflex/OctoFlexConfig.h>
 #include <geometry_msgs/Twist.h>
+#include <joy/Joy.h>
 #include <octocostmap/costmap_3d.h>
 #include <tf/transform_listener.h>
 
@@ -21,6 +22,8 @@ float visPause_;
 geometry_msgs::Twist cmd_;
 boost::shared_ptr<octocostmap::Costmap3D> costmap_;
 ros::Timer loopTimer_;
+ros::Publisher joyout_pub;
+bool allowRecentCommand;
 
 void allowCommand(const tf::TransformListener& listener){
   float dt = simTime_/(float)numSteps_;
@@ -35,6 +38,8 @@ void allowCommand(const tf::TransformListener& listener){
   //tf_listener_.transformPose("/odom", ros::Time(0), currentPose, "/base_link", currentPose);
   
   for(int i = 1; i <= numSteps_; i++){
+    // Assume command is safe unless proven otherwise
+    allowRecentCommand = true;
     // Propigate curvature addition through time
     float th = tf::getYaw(currentPose.pose.orientation);
     float v = cmd_.linear.x;
@@ -59,10 +64,10 @@ void allowCommand(const tf::TransformListener& listener){
     tf::Pose shift_amount(tf::createQuaternionFromYaw(dTh), tf::Vector3(dx, dy, 0.0));
     tf_origin.setData(tf_origin * shift_amount);
     tf::poseStampedTFToMsg(tf_origin, origin);
-    std::cout << "x: " << origin.pose.position.x << " y: " << origin.pose.position.y << " th: " << tf::getYaw(origin.pose.orientation) << std::endl;
     try{
       bool collision_detected = costmap_->checkRectangularPrismBase(origin, width_, height_, length_, resolution_, checkFullVolume_);
       if(collision_detected){
+	allowRecentCommand = false;
 	ROS_DEBUG("Collision detected, do not execute command!");
       }
     } catch (tf::TransformException ex) {
@@ -70,11 +75,28 @@ void allowCommand(const tf::TransformListener& listener){
     }
     ros::Duration(visPause_).sleep();
   }
-  // Did not detect a collision, so assume this control is safe!
 }
 
 void twistCallback(const geometry_msgs::Twist::ConstPtr& msg){
   cmd_ = *msg;
+}
+
+void joyCallback(const joy::Joy::ConstPtr& msg)
+{
+	/* axes[0] is Wz
+	axes[1] is Vx*/
+
+	// Publish new joy message
+	joy::Joy newJoy = *msg;
+	newJoy.axes = msg->axes;
+	newJoy.buttons = msg->buttons;
+	
+	if(!allowRecentCommand){
+	  newJoy.axes[1] = 0.0;
+	  newJoy.axes[0] = 0.0;
+	}
+	
+	joyout_pub.publish(newJoy);
 }
 
 void callback(octoflex::OctoFlexConfig &config, uint32_t level)
@@ -99,7 +121,7 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "octoflex");
   ros::NodeHandle n;
   tf::TransformListener tf_listener;
-  //joyout_pub = n.advertise<joy::Joy>("joy_output", 1);
+  joyout_pub = n.advertise<joy::Joy>("joy_output", 1);
   
   dynamic_reconfigure::Server<octoflex::OctoFlexConfig> srv;
   dynamic_reconfigure::Server<octoflex::OctoFlexConfig>::CallbackType f;
@@ -110,9 +132,7 @@ int main(int argc, char **argv)
 
   ros::Subscriber cmd_sub = n.subscribe("cmd_vel", 100, twistCallback);
   
-  //ros::Subscriber front_sub = n.subscribe("/bubble/forward", 100, frontFloatCallback);
-  
-  //ros::Subscriber side_sub = n.subscribe("/bubble/side", 100, sideFloatCallback);
+  ros::Subscriber joy_sub = n.subscribe("joy", 100, joyCallback);
   
   loopTimer_ = n.createTimer(ros::Duration(1.0/rate_), boost::bind(&allowCommand,boost::ref(tf_listener)));
   

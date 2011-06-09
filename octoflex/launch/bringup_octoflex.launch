@@ -1,0 +1,69 @@
+<launch>
+
+  <node pkg="joy" type="joy_node" name="joy_node" respawn="true" >
+	  <param name="autorepeat_rate" value="20.0" />
+	  <param name="dev" type="string" value="/dev/input/js0" />
+	  <param name="deadzone" value="0.12" />
+  </node>
+
+  <node pkg="wheelchair_base_controller" type="joy2chair.py" name="joy2chair" output="screen" respawn="true" >
+	  <param name="port_name" value="/dev/sensors/ftdi_A600aivC" />
+	  <remap from="joy" to="/joy_reflex" />
+  </node>
+
+  <node pkg="wheelchair_base_controller" type="joy2twist.py" name="joytwisterizer" respawn="true" />
+
+  <node pkg="wheelchair_base_controller" type="otto_ekf.py" name="Otto_EKF" respawn="true" />
+  
+  <node pkg="reflexive_avoidance" type="reflexive_obstacle_avoidance" name="reflexive_halt" output="screen" respawn="true" >
+    <remap from="range" to="/sonars" />
+    <remap from="joy" to="/joy_limited" />
+    <remap from="joy_output" to="/joy_reflex" />
+    <rosparam>
+      use_kinect: false
+      num_points: 100
+      use_sonars: true
+      front_sonar_thresh: 0.35
+      side_sonar_thresh: 0.3
+      use_laser: false
+      front_laser_thresh: 0.5
+      front_laser_angle: 2.0
+      side_laser_thresh: 0.45
+      side_laser_angle: 2.0
+    </rosparam>
+  </node>
+  
+  <node pkg="reflexive_plus" type="speed_limiter" name="sonar_speed_limiter" output="screen" respawn="true" >
+    <remap from="bubble/forward" to="/bubble/forward" />
+    <remap from="bubble/side" to="/bubble/side" />
+    <remap from="joy" to="/joy_octoflex" />
+    <remap from="joy_output" to="/joy_limited" />
+    <rosparam>
+      joystickMin: 0.15
+      frontRangeMin: 0.5
+      frontRangeMax: 2.0
+      sideRangeMin: 0.5
+      sideRangeMax: 2.0
+    </rosparam>
+  </node>
+
+  <node pkg="octoflex" type="octoflex" name="octoflex" output="screen" respawn="true" >
+    <remap from="joy" to="/joy" />
+    <remap from="joy_output" to="/joy_octoflex" />
+    <rosparam>
+      checkFullVolume: false
+      forwardTime: 0.3
+      numberOfSteps: 10
+      length: 1.14
+      width: 0.66
+      height: 1.525
+      originOffsetX: -0.16
+      originOffsetY: 0
+      originOffsetZ: 0.125
+      resolution: 0.025
+      rate: 20
+      visualizationPause: 0
+    </rosparam>
+  </node>
+  
+</launch>
